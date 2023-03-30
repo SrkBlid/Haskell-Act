@@ -80,3 +80,99 @@
 --  zip: toma 2 listas y une sus elementos en tuplas
 --       ej: zip [1,2,3] ["uno", "dos", "tres"] == [(1,"uno"),(2,"dos"),(3,"tres")]
 --       SI EL TAMAÑO DE LAS LISTAS NO CONCUERDAN SE ACORTAN A LA CANTIDAD MENOR
+
+---------------------------------------------------------------
+
+-- :t X //nos da el tipo de una expresión
+--	Int     -> Representa enteros
+--	Integer -> Representa enteros pero sin acotar asi que representan numeros muchos
+--             mas grandes, pero Int es mas eficiente
+--	Float   -> Representa reales, numeros con coma
+--	Double  -> Representa reales pero con el doble de precisión
+--	Bool    -> Representa tipos booleanos
+--	Char    -> Representa un caracter
+
+-- a -> Es una variable de tipo, puede ser cualquier tipo
+-- Funciones polimórficas: Aquellas que su tipo es a
+
+--Restricciones de clase: Son representadas con => al comienzo de la definición de la función.
+--	Eq       -> Permite que el tipo contenga las funciones == y /=
+--	Ord      -> Permite que contenga funciones de comparación cómo >, <, >=, <= para ser 
+--              de este tipo tiene que ser Eq
+--	Show     -> Permite representar sus elementos como cadenas
+--	Read     -> Lo opuesto a Show, toma una cadena y devuelve su valor. Read solo funciona
+--              con expresiones/operaciones y no con elementos debido a que tomar el 
+--              resultado de la misma para interpretar su tipo:
+--		EJ BIEN: read "8.2"+3.5 = 11.7
+--		EJ MAL: read "4" = ERROR
+--		EJ MAL CORREGIDO: read "4" :: Int = 4
+--	Enum     -> Son tipos que pueden ser ordenados, podemos usar los miembros de las listas
+--              aritméticas, tambien esta definido el succ y pred
+--	Bounded  -> Poseen limites inferior y superiores con minBound y maxBound
+--	Num      -> Clase de tipos númericos, sus miembros se comportan como todos los numeros
+--              (Int, Integer, Float, Double), debe ser de tipo Show y Eq
+--	Integral -> Es Num pero solo son Int e Integer
+--	Floating -> Es Num pero solo son Float y Double
+
+---------------------------------------------------------------
+
+--Pattern Matching: Consta de construir los casos de tu código por
+-- patrones de tal manera que cada vez que ejecutemos el código este 
+-- vaya a parar solo al caso donde le corresponde.
+-- error: Esta función toma una cadena y genera un error en tiempo de ejecución con la misma.
+
+--As Patterns: Los patrones como son útiles para descomponer algo usando un patrón, 
+-- de forma que se ligue con las variables que queramos y además podamos mantener 
+-- una referencia a ese algo como un todo.
+-- EJ: xs@(x:y:ys), esto es lo mismo que x:y:ys pero nos permite acceder facilmente a 
+--     la lista completa usando xs en lugar de tener que escribir x:y:ys
+
+--Guardas: A diferencia de los patrones, que aseguran que un valor tenga determinada forma,
+-- las guardas son una forma de comprobar si alguna propiedad de un valor es cierta o falsa,
+-- son como las sentencias if.
+--where: liga variables a valores al final de una función de modo que toda la función y sus 
+-- guardas puedan acceder a ellas.
+-- EJ: En lugar de..
+--	bmi weight height
+--		| weight/height ^ 2 <= 18.5 = "Infrapeso"
+--		| weight/height ^ 2 <= 25.0 = "Normal"
+--		| weight/height ^ 2 <= 30.0 = "Sobrepeso"
+--		| otherwise = "Gordo"
+
+--	Podemos definirlo cómo
+--	bmi weight height
+--		| bmi <= skinny = "Infrapeso"
+--		| bmi <= normal = "Normal"
+--		| bmi <= over = "Sobrepeso"
+--		| otherwise = "Gordo"
+--		where bmi = weight/height ^ 2
+--		      skinny = 18.5
+--		      normal = 25.0
+--		      over = 30.0
+--	ó cómo:
+--		where bmi = weight/height ^ 2
+--		      (skinny, normal, over) = (18.5, 25.0, 30.0)
+
+--let: Son como las where pero dejan ligar valores en cualquier lugar y son expresiones en si
+-- mismas pero de uso muy local asi que no pueden extenderse entre las guardas.
+-- Su forma es: let <definición> in <expresión>
+-- Las variables que definamos en let son accesibles en la parte in.
+-- Ej: [let square x = x*x in (square 5, square 3, square 2)]
+--		= [(25,9,4)]
+-- let puede ser utilizado en listas intensionadas sin tener que usar su parte in
+--	Ej: calcBmis :: (RealFloat a) => [(a,a)] -> [a]
+--	    calcBmis xs = [bmi | (w,h) <- xs, let bmi = w/h ^ 2]
+
+--case: Son expresiones donde se toman casos especificos de código, son como los switch en C. 
+-- Su sintaxis es: case <expresion> of <patron> -> resultado
+--				    <patron> -> resultado
+--				    <patron> -> resultado
+--				    ...
+-- Pueden ser utilizadas en cualquier lugar.
+-- EJ: 
+--   descList :: [a] -> String
+--   descList xs = "The list is" ++ case xs of [] -> "empty"
+--						                       [x] -> "unitary"
+--						                       xs -> "complex"
+
+---------------------------------------------------------------
