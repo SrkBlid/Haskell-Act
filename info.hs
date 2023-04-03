@@ -176,3 +176,121 @@
 --						                       xs -> "complex"
 
 ---------------------------------------------------------------
+
+--ALGUNAS FUNCIONES RECURSIVAS
+
+--maximum: toma una lista de elementos ordenados y devuelve la más grande
+-- DEF. 1:
+-- maximum' :: (Ord a) => [a] -> a
+-- maximum' [] = error "maximo de una lista vacia"
+-- maximum' [x] = x
+-- maximum' (x:xs)
+--      | x > maxTail = x
+--      | otherwise = maxTail
+--      where maxTail = maximum' xs
+-- DEF. 2:
+-- maximum'' :: (Ord a) => [a] -> a
+-- maximum'' [] = error "maximo de una lista vacia"
+-- maximum'' [x] = x
+-- maximum'' (x:xs) = max x (maximum'' xs)
+
+--zip: toma dos listas y las combina en una
+-- zip': [a] -> [b] -> [(a,b)]
+-- zip' _ [] = []
+-- zip' [] _ = []
+-- zip' (x:xs) (y:ys) = (x,y): zip' xs ys
+
+--quicksort: metodo de ordenamiento
+-- quicksort :: (Ord a) => [a] -> [a]
+-- quicksort [] = []
+-- quicksort (x:xs) =
+--    let bigSorted = quicksort [a | a <- xs, a > x]
+--        smallSorted = quicksort [a | a <- xs, a <= x]
+--        in smallSorted ++ [x] ++ bigSorted
+
+---------------------------------------------------------------
+
+--Funciones de orden superior: Son aquellas funciones que toman funciones cómo parámetros o
+-- devuelven funciones cómo resultado
+-- EJ:
+-- zipWith' :: (a -> b -> c) -> [a] -> [b] -> [c]
+-- zipWith' _ [] _ = []
+-- zipWith' _ _ [] = []
+-- zipWith' f (x:xs) (y:ys) = f x y : zipWith' f xs ys
+--
+-- zipWith' (+) [4,2,5,6] [2,6,2,3] = [6,8,7,9]
+-- zipWith' max [6,3,2,1] [7,3,1,5] = [7,3,2,5]
+-- zipWith' (zipWith' (*)) [[1,2,3], [3,5,6], [2,3,4]] [[3,2,2], [3,4,5], [5,4,3]]
+--          = [[3,4,6], [9,20,30], [10,12,12]]
+-- zipWith' (++) ["foo ", "bar ", "baz "] ["fighters", "hoppers", "aldrin"]
+--          = ["foo fighters", "bar hoopers", "baz aldrin"]
+-- zipWith' (*) (replicate 5 2) [1..] = [2,4,6,8,10]
+--
+-- flip: Dada una función y 2 argumentos, devuelve una función parecida pero los dos
+--  primeros paramétros estan intercambiados
+--  flip' :: (a -> b -> c) -> (b -> a -> c)
+--  flip' f = g
+--      where g x y = f y x
+--
+--  EJ:
+--    flip' zip [1,2,3,4,5] [6,7,8,9,0] = [(6,1),(7,2),(8,3),(9,4),(0,5)]
+
+--Funciones currificadas: Currificar consiste en transformar una función que utiliza
+-- multiples argumentos en una secuencia de funciones que utilizan un único argumento
+-- Ej:
+-- max 4 5 == (max 4) 5
+
+--Funciones al vuelo: Son aquellas funciones que se llaman con menos argumentos de los nec.
+-- EJ: En lugar de..
+-- compareWithHundred :: (Num a, Ord a) => a -> Ordening
+-- compareWithHundred x = compare 100 x
+--
+-- Usamos..
+-- compareWithHundred :: (Num a, Ord a) => a -> Ordening
+-- compareWithHundred x = compare 100 x
+
+--ASOCIACIONES Y FILTROS
+--
+-- map: Toma una función y una lista, le aplica esa función a la lista
+-- map :: (a -> b) -> [a] -> [b]
+-- map _ [] = []
+-- map f (x:xs) = f x: map f xs
+--
+--  EJ:
+--  map (+3) [1,2,3,4,5] = [4,5,6,7,8]
+--  map (++ "!") ["BIFF", "BANG", "PUFF"] = ["BIFF!", "BANG!", "PUFF!"]
+--  map (replicate 3) [3..6] = [[3,3,3], [4,4,4], [5,5,5], [6,6,6]]
+--  map (map (^2)) [[1,2], [3,4,5,6], [7,8]] = [[1,4], [9,16,25,36], [49,64]]
+--  map fst [(1,2), (3,5), (6,3), (2,6), (2,5)] = [1,3,6,2,2]
+
+-- filter: Toma un predicado(Booleano) y una lista, devuelve la lista que lo satisface
+-- filter :: (a -> Bool) -> [a] -> [a]
+-- filter _ [] = []
+-- filter p (x:xs)
+--      | p x = x : filter p xs
+--      | otherwise = filter p xs
+--
+--  EJ:
+--  filter (>3) [1,5,3,2,1,6,4,3,2,1] = [5,6,4]
+--  filter even [1..10] = [2,4,6,8,10]
+--  let notNull x = not (null x) in filter notNull [[1,2,3], [], [3,4,5], [2,2], [], []]]
+--          = [[1,2,3], [3,4,5], [2,2]]
+--  filter ('elem' ['A'..'Z']) "i lauGh At You BecAuse u r aLL the Same" = "GAYBALLS"
+
+--takeWhile: Toma un predicado y una lista, la recorre y devuelve estos elementos
+-- mientras el predicado se mantenga cierto
+--  EJ:
+--  takeWhile (/= 9) [1..] = [1,2,3,4,5,6,7,8]
+--  takeWhile (/= 'a') "Los elefantes" = "Los elef"
+--  sum (takeWhile (<10000) (filter odd (map (^2) [1..]))) = 166650
+
+--LAMBDAS: Son funciones anonimas que suelen ser usadas cuando necesitas una función una
+-- sola vez, se usan para no tener que usar un where, estas son expresiones.
+-- Se utiliza el \<expresión> para definirlas
+--  EJ:
+--  map (\(a,b) -> a+b) [(1,2), (3,5), (6,3)] = [3, 8, 9]
+
+--PLIEGUES: Toma una función binaria, un valor inicial (acumulador) y una lista a plegar
+-- Hay 2 tipos de pliegues:
+-- ~foldl: 
+-- ~foldr:
