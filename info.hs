@@ -290,7 +290,139 @@
 --  EJ:
 --  map (\(a,b) -> a+b) [(1,2), (3,5), (6,3)] = [3, 8, 9]
 
---PLIEGUES: Toma una función binaria, un valor inicial (acumulador) y una lista a plegar
--- Hay 2 tipos de pliegues:
--- ~foldl: 
--- ~foldr:
+--Pliegues(folds): Son funciones que toman una función binaria (sumas, restas, etc), 
+-- un valor inicial (acumulador) y una lista que plegar.
+--Hay 2 tipos de pliegues:
+--	•foldl: Pliega la lista empezando desde la izquierda, la función binaria es aplicada
+--   junto a el valor inicial y la cabeza de la lista.
+--	 EJ: 
+--	 sum' :: (Num a) => [a] -> a
+--	 sum' xs = foldl (\acc x -> acc + x) 0 xs
+--		La función lambda (\acc) es lo mismo que (+)
+--
+--	MISMA FUNCIÓN PERO SIN LAMBDA
+--	 sum' :: (Num a) => [a] -> a
+--	 sum' xs = foldl (+) 0 xs
+--
+--	MISMA FUNCIÓN PERO CURRIFICADA
+--	 sum' :: (Num a) => [a] -> a
+--	 sum' = foldl (+) 0
+--
+--	sum' [3,5,2,1]
+--	0+3
+--	 [3,5,2,1]
+--	3+5
+--	 [5,2,1]
+--	8+2
+--	 [2,1]
+--	10+1
+--	 [1]
+--	11
+--
+-- Cuando estamos hablando de pliegues, tanto el tipo del acumulador como del resultado final son el mismo.
+--
+--	•foldr: Pliega por la derecha, la función binaria es aplicada al ultimo elemento de la lista.
+--	EJ:
+--	 map' :: (a -> b) -> [a] -> [b]
+--	 map' f xs = foldr (\x acc -> f x : acc) [] xs
+--	 Lo que hace es evaluar el elemento del final y lo concatena en la cabeza del acumulador, 
+--   en este caso, la lista vacia.
+--
+--	map' (+3) [1,2,3]
+--	3+3 -> 6:[]
+--	 [1,2,3]
+--	2+3 -> 5:[6]
+--	 [1,2]
+--	1+3 -> 4:[5,6]
+--	 [1]
+--	[4,5,6]
+--
+--	REFLEXIÓN DE ESTE EJEMPLO: Podriamos haber aplicado esto mismo con un 
+--  foldl (map' f xs = foldl(\acc x -> acc + [f x]) [] xs) pero el problema es que la función ++ es bastante
+--  menos eficiente que :, asi que normalmente usaremos foldr cuando construimos a partir de una lista.
+
+-- foldl y foldr: Funcionan de la misma manera solo que el foldl consume elementos por la izquierda 
+-- (desde el primero) y el foldr consume elementos por la derecha (desde el ultimo).
+-- La función binaria de foldl tienen el acumulador cómo primer parametro y el valor actual cómo segundo
+-- parametro (\acc x -> ...) mientras que la función binaria de foldr es al revez, tiene como primer 
+-- parametro al valor actual y como acumulador al segundo parametro (\x acc -> ...).
+
+-- Si ponemos al revez una lista podemos hacer foldl como si fuera un foldr y viceversa.
+
+-- Los foldlr funcionan con listas infinitas mientras que los foldl no ya que si a una lista infinita 
+-- le aplicas foldr, en algun momento va a llegar al inicio de esa lista, mientras que si le aplicamos foldl,
+-- nunca llegariamos al final de la misma.
+
+-- Las funciones foldl1 foldr1 son muy parecidas a foldl y foldr, solo que no hay necesidad de indicar 
+-- un valor inicial ya que asumen que el primer(último) elemento de la lista es el valor inicial. 
+-- Tienen errores de compilación con listas vacias, lo que no sucede con foldl o foldr.
+--	Ej: sum = foldl1 (+)
+--
+-- scanl y scanr: Son como foldl y foldr pero tambien devuelve cómo resultado los acumuladores intermedios,
+-- es decir, los valores que vamos acumulando durante el proceso.
+-- MISMO EJ DE SUMA:
+--  scanl (+) 0 [3,5,2,1] = [0,3,8,10,11]
+--  scanr (+) 0 [3,5,2,1] = [11,8,3,1,0]
+--  Como vemos, ademas del res. final, da los res. parciales. Además, al usar scanl, el resultado final 
+--  sera el último elemento de la lista resultante mientras que son scanr sera el primero.
+
+--Funciones con $
+-- ($) :: (a -> b) -> a -> b
+-- f $ x = f x
+--
+-- Mientras que el espacio entre funciones tiene un alto orden de precedencia (asocia de izquierdas), 
+-- la función $ tiene un bajo orden de precedencia (asocia a la derecha).
+-- Basicamente sirve para no tener que escribir tanto, la expresión a la derecha del $ sera aplicada cómo 
+-- parámetro a la función de la izquierda.
+-- EJ:
+--  sqrt 3 + 4 + 9 = suma 9 más 4 más raiz de 3
+--	si queremos la raiz de 3 + 4 + 9 es...
+--  sqrt (3 + 4 + 9)
+--	o lo que es igual a...
+--  sqrt $ 3 + 4 + 9
+
+--Composición de funciones
+-- En matematicas esta definido cómo: (f • g)x = f(g(x)) que significa que al componer 2 funciones 
+-- obtenemos 1 nueva, tambien se puede ver que llamamos a g con x y luego llamamos a f con su resultado.
+-- En Haskell la composición de funciones es practicamente lo mismo, esta definida cómo:
+--  (.) :: (b -> c) -> (a -> b) -> a -> c
+--  f . g = \x -> f(g x)
+--
+-- La composición de funciones se usa para crear funciones al vuelo pasa ser pasadas a otras funciones, 
+-- se pueden usar lambdas en lugar de composición pero estas últimas son más claras y concisas.
+--
+-- EJ: CONVERTIR TODOS LOS NUMEROS A NEGATIVO, USANDO SU ABSOLUTO Y NEGANDOLO
+--  CON LAMBDA...
+--   map (\x -> negate(abs x)) [5,-3,-6,7,-3,2,-19,24]
+--   = [-5,-3,-6,-7,-3,-2,-19,-24]
+--
+--  CON COMPOSICION...
+--   map (negate . abs) [5,-3,-6,7,-3,2,-19,24]
+--   = [-5,-3,-6,-7,-3,-2,-19,-24]
+--
+-- La composición de funciones es asociativa a derecha, es decir, que podemos componer varias 
+-- funciones al mismo tiempo.
+-- EJ:
+--  map (\xs -> negate (sum (tail xs))) [[1..5], [3..6], [1..7]]
+--  ==
+--  map (negate . sum . tail) [[1..5], [3..6], [1..7]]
+--
+-- Con las funciones que toman varios parametros, si queremos usarlas en la composición de funciones, 
+-- tenemos que aplicarlas parcialmente de forma que cada función tome solo un parámetro.
+--
+-- Otro uso común de la composición de funciones es la definición de funciones en el llamado estilo
+-- libre de puntos.
+--
+-- Estilo libre de puntos: Es una función que no menciona explicitamente los puntos (valores) del 
+-- espacio sobre los que actua.
+-- EJ1:
+--  sum' xs = foldl (+) 0 xs
+--  ==
+--  sum' = foldl (+) 0
+--  EXPLICACIÓN: Gracias a la currificación, podemos eliminar xs de ambos lados ya que 'foldl (+) 0'
+--  es una función que toma una lista.
+-- EJ2:
+--  fn = ceiling (negate (tan (cos (max 50 x))))
+--  (No podemos eliminar simplemente x de ambos lados ya que 'max 50' solo no tiene mucho sentido 
+--  por lo que usamos composición de funciones)
+--  fn = ceiling . negate . tan . cos . max 50
