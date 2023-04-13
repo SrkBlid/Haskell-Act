@@ -1,0 +1,230 @@
+--Ejercicio 1
+-- cuadrado :: Int -> Int
+-- cuadrado x = x*x
+--
+-- head :: [a] -> a
+-- head (x:xs) = x
+--
+-- Orden aplicativo
+--  2*cuadrado(head.[2,4,5,6,7,8])
+--  [Def. head]
+--  2*cuadrado(2)
+--  [Def. cuadrado]
+--  2*2*2
+--  [Aritmetica]
+--  8
+--  		CANT. REDUCCIONES = 3
+--
+-- Orden normal
+--  2*cuadrado(head[2,4,5,6,7,8])
+--  [Def. cuadrado]
+--  2*(head[2,4,5,6,7,8])*(head[2,4,5,6,7,8])
+--  [Def. head]
+--  2*2*(head[2,4,5,6,7,8])
+--  [Aritmetica]
+--  4*(head[2,4,5,6,7,8])
+--  [Def. head]
+--  4*2
+--  [Aritmetica]
+--  8
+--		CANT. REDUCCIONES = 5
+
+--Ejercicio 2
+-- Dado -> linf = 1 : linf
+-- Resolver para head.linf
+--
+-- Orden aplicativo
+--  head.linf
+--  [Def. linf]
+--  head.(1 : linf)
+--  [Def. linf]
+--  head.(1 : (1 : linf))
+--  ...
+--		CANT. REDUCCIONES = Infinitas
+--
+-- Orden normal
+--  head.linf
+--  [Def. linf]
+--  head.(1 : linf)
+--  [Def. head]
+--  1
+--		CANT. REDUCCIONES = 2
+
+--Ejercicio 3
+-- f :: Int -> Int -> Int
+-- f x 0 = x
+-- f x (n+1) = cuadrado (f x n)
+--
+-- Resolver para la expresion f.2.3 con aplicativo y normal
+--
+-- Orden aplicativo
+--  f.2.(2+1)
+--  [Def. f]
+--  cuadrado (f 2 2)
+--  [Def. f]
+--  cuadrado (cuadrado f 2 1))
+--  [Def. f]
+--  cuadrado (cuadrado (cuadrado f 2 0)))
+--  [Def. f]
+--  cuadrado (cuadrado (cuadrado 2)))
+--  [Def. cuadrado]
+--  cuadrado (cuadrado (2*2))
+--  [Aritmetica]
+--  cuadrado (cuadrado 4)
+--  [Def. cuadrado]
+--  cuadrado (4*4)
+--  [Aritmetica]
+--  cuadrado 16
+--  [Def. cuadrado]
+--  16*16
+--  [Aritmetica]
+--  256
+--		CANT. REDUCCIONES = 10
+--
+-- Orden normal
+-- f.2.(2+1)
+-- [Def. f]
+-- cuadrado (f 2 2)
+-- [Def. cuadrado]
+-- (f 2 2)*(f 2 2)
+-- [Def. f]
+-- (cuadrado (f 2 1))*(f 2 2)
+-- [Def. cuadrado]
+-- ((f 2 1)*(f 2 1))*(f 2 2)
+-- [Def. f]
+-- ((cuadrado f 2 0)*(f 2 1))*(f 2 2)
+-- [Def. cuadrado]
+-- (((f 2 0)*(f 2 0))*(f 2 1))*(f 2 2)
+-- [Def. f]
+-- ((2*(f 2 0))*(f 2 1))*(f 2 2)
+-- [Def. f]
+-- ((2*2)*(f 2 1))*(f 2 2)
+-- [Aritmetica]
+-- (4*(f 2 1))*(f 2 2)
+-- [Def. f]
+-- (4*(cuadrado f 2 0))*(f 2 2)
+-- [Def. cuadrado]
+-- (4*((f 2 0)*(f 2 0)))*(f 2 2)
+-- [Def. f]
+-- (4*(2*(f 2 0)))*(f 2 2)
+-- [Def. f]
+-- (4*(2*2))*(f 2 2)
+-- [Aritmetica]
+-- (4*4)*(f 2 2)
+-- [Aritmetica]
+-- 16*(f 2 2)
+-- [Def. f]
+-- 16*(cuadrado (f 2 1))
+-- [Def. cuadrado]
+-- 16*((f 2 1)*(f 2 1))
+-- [Def. f]
+-- 16*((cuadrado f 2 0)*(f 2 1))
+-- [Def. cuadrado]
+-- 16*(((f 2 0)*(f 2 0))*(f 2 1))
+-- [Def. f]
+-- 16*((2*(f 2 0))*(f 2 1))
+-- [Def. f]
+-- 16*((2*2)*(f 2 1))
+-- [Aritmetica]
+-- 16*(4*(f 2 1))
+-- [Def. f]
+-- 16*(4*(cuadrado f 2 0))
+-- [Def. cuadrado]
+-- 16*(4*((f 2 0)*(f 2 0)))
+-- [Def. f]
+-- 16*(4*(2*(f 2 0)))
+-- [Def. f]
+-- 16*(4*(2*2))
+-- [Aritmetica]
+-- 16*(4*4)
+-- [Aritmetica]
+-- 16*16
+-- [Aritmetica]
+-- 256
+--		CANT. REDUCCIONES = 29
+
+--Ejercicio 4
+-- square :: Int -> Int
+-- square x = x*x
+--
+-- inf :: Int
+-- inf = inf+1
+--
+-- Orden aplicativo
+-- square.inf
+-- [Def. inf]
+-- square.(inf+1)
+-- [Def. inf]
+-- square.((inf+1)+1)
+-- [Def. inf]
+-- square.(((inf+1)+1)+1)
+-- ...
+--		CANT. REDUCCIONES = Infinitas
+--
+-- Orden normal
+-- square.inf
+-- [Def. square]
+-- inf*inf
+-- [Def. inf]
+-- (inf+1).inf
+-- [Def. inf]
+-- ((inf+1)+1).inf
+-- [Def. inf]
+-- (((inf+1)+1)+1).inf
+-- ...
+--		CANT. REDUCCIONES = Infinitas
+
+--Ejercicio 5
+-- f :: Int -> Int -> Int
+-- f x 0 = x
+-- f x (n+1) = cuadrado (f x n)
+--
+-- Resolver para la expresion f.2.3 con lazy
+--
+-- f.2.(2+1)
+-- [Def. f]
+-- cuadrado (f 2 2)
+--  	= [cuadrado = x*x]
+-- x*x
+--  	= [x = f 2 2]
+-- [Def. f]
+-- (cuadrado (f 2 1)*x
+--  	= [cuadrado = y*y]
+-- (y*y)*x
+--  	= [y = f 2 1]
+-- [Def. f]
+-- ((cuadrado (f 2 0))*y)*x
+--  	= [cuadrado = z*z]
+-- ((z*z)*y)*x 
+--  	= [z = 2]
+-- [Reemplazo z = 2]
+-- ((2*2)*y)*x
+-- [Aritmetica]
+-- (4*y)*x
+-- [Reemplazo y = (z*z)]
+-- (4*(z*z))*x
+-- [Reemplazo z = 2]
+-- (4*(2*2))*x
+-- [Aritmetica]
+-- (4*4)*x
+-- [Aritmetica]
+-- 16*x
+-- [Reemplazo x = (y*y)]
+-- 16*(y*y)
+-- [Reemplazo y = (z*z)]
+-- 16*(z*z)*(z*z)
+-- [Reemplazo z = 2]
+-- 16*(2*2)*(2*2)
+-- [Aritmetica]
+-- 16*4*(2*2)
+-- [Aritmetica]
+-- 16*4*4
+-- [Aritmetica]
+-- 16*16
+-- [Aritmetica]
+-- 256
+--		CANT. REDUCCIONES = 16 o 22 (Contando definiciones)
+
+--Ejercicio 6
+--Se puede cambiar temporalmente el orden de evaluación usando el operador $. Se puede utilizar para ahorrar parentesis o para composición de funciones.
+--Ejemplo: sqrt 3 + 4 + 9 -> sqrt $ 3 + 4 + 9 = sqrt(3 + 4 + 9)
