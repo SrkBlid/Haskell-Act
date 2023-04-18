@@ -167,3 +167,40 @@ infPares = [x | x <- [0..], mod x 2 == 0]
 
 infParesMat :: [Int]
 infParesMat = [2*x | x <- [0..]]
+
+------------------------------------------------------------------------------
+--Factorial de 5 formas distintas
+--fact :: Int -> Int
+--fact 0 = 1
+--fact n = n*fact (n-1)
+
+--Forma 1
+--Retorna los factoriales hasta n
+factoriales_1 :: Int -> [Int]
+factoriales_1 n =
+    reverse (aux n)
+    where aux 0 = [1]
+          aux n = fact n: aux (n-1)
+
+--Forma 2
+--Definición con acumuladores
+factoriales_2 :: Int -> [Int]
+factoriales_2 n =
+    reverse (aux(n+1) 0 [1])
+    where aux n m (x:xs) = if n==m then []
+          else aux n (m+1) (x:xs) ++ [fact m]
+
+--Forma 3
+--Con listas por comprensión
+factoriales_3 :: Int -> [Int]
+factoriales_3 n = [fact x | x <- [0..n]]
+
+--Forma 4
+--Con funciones de orden superior, el map aplica una función a una lista
+factoriales_4 :: Int -> [Int]
+factoriales_4 n = map fact [0..n]
+
+--Forma 5
+--Con scanl, el cual te devuelve los resultados parciales en forma de lista, el foldl te devuelve el resultado directamente en forma de Int
+factoriales_5 :: Int -> [Int]
+factoriales_5 n = scanl (*) 1 [1..n] 
