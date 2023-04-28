@@ -62,9 +62,9 @@
 --  [Def. f]
 --  cuadrado (f 2 2)
 --  [Def. f]
---  cuadrado (cuadrado f 2 1))
+--  cuadrado (cuadrado (f 2 1))
 --  [Def. f]
---  cuadrado (cuadrado (cuadrado f 2 0)))
+--  cuadrado (cuadrado (cuadrado (f 2 0)))
 --  [Def. f]
 --  cuadrado (cuadrado (cuadrado 2)))
 --  [Def. cuadrado]

@@ -245,6 +245,9 @@ posicionesC2 (x:xs) c = posicionesC2' (x:xs) c 0
             | x == c = i:posicionesC2' xs c (i+1)
             | otherwise = posicionesC2' xs c (i+1) 
 
+posicionesC'' :: [Char] -> Char -> [Int]
+posicionesC'' (x:xs) c = [i | (x,i) <- zip (x:xs) [0..], c == x]
+
 --11
 compact2 :: Eq a => [a] -> [a]
 compact2 [] = []
@@ -254,3 +257,356 @@ compact2 (x:xs)
     | otherwise = x:compact2 xs
 
 --PRÁCTICO 4--
+
+--1
+--cuadrado :: Int -> Int
+--cuadrado x = x*x
+--
+--head :: [a] -> a
+--head (x:xs) = x
+--
+--APLICATIVO
+--2*cuadrado(head[2,4,5,6,7,8])
+--DEFINICIÓN HEAD
+--2*cuadrado(2)
+--DEFINICIÓN CUADRADO
+--2*2*2
+--ARITMETICA
+--8
+--Cantidad de reducciones: 3
+--
+--NORMAL
+--2*cuadrado(head[2,4,5,6,7,8])
+--DEFINICIÓN CUADRADO
+--2*(head[2,4,5,6,7,8])*(head[2,4,5,6,7,8])
+--DEFINICIÓN HEAD
+--2*(2)*(head[2,4,5,6,7,8])
+--DEFINICIÓN HEAD
+--2*(2)*(2)
+--ARITMETICA
+--8
+--Cantidad de reducciones: 4
+
+--2
+--linf = 1:linf
+--
+--APLICATIVO
+--head.linf
+--DEFINICIÓN LINF
+--head(1:linf)
+--DEFINICIÓN LINF
+--head(1:1:linf)
+-- ...
+--Cantidad de reducciones: Infinitas
+--
+--NORMAL
+--head.linf
+--DEFINICIÓN LINF
+--head(1:linf)
+--DEFINICIÓN HEAD
+--1
+--Cantidad de reducciones: 2
+
+--3
+-- f :: Int -> Int -> Int
+-- f x 0 = x
+-- f x (n+1) = cuadrado (f x n)
+--
+--APLICATIVO
+--f.2.3
+--DEFINICIÓN F
+--cuadrado(f 2 2)
+--DEFINICIÓN F
+--cuadrado(cuadrado(f 2 1))
+--DEFINICIÓN F
+--cuadrado(cuadrado(cuadrado(f 2 0)))
+--DEFINICIÓN F
+--cuadrado(cuadrado(cuadrado(2)))
+--DEFINICIÓN CUADRADO
+--cuadrado(cuadrado(2*2))
+--ARITMETICA
+--cuadrado(cuadrado(4))
+--DEFINICIÓN CUADRADO
+--cuadrado(4*4)
+--ARITMETICA
+--cuadrado(16)
+--DEFINICIÓN CUADRADO
+--16*16
+--ARITMETICA
+--256
+--Cantidad de reducciones: 10
+--
+--NORMAL
+--f.2.3
+--DEFINICIÓN F
+--cuadrado(f 2 2)
+--DEFINICIÓN CUADRADO
+--(f 2 2)(f 2 2)
+--DEFINICIÓN F
+--(cuadrado(f 2 1))(f 2 2)
+--DEFINICIÓN CUADRADO
+--((f 2 1)(f 2 1))(f 2 2)
+--DEFINICIÓN F
+--((cuadrado(f 2 0))(f 2 1))(f 2 2)
+--DEFINICIÓN CUADRADO
+--(((f 2 0)(f 2 0))(f 2 1))(f 2 2)
+--DEFINICIÓN F
+--((2*(f 2 0)))(f 2 1))(f 2 2)
+--DEFINICIÓN F
+--((2*2))(f 2 1))(f 2 2)
+--ARITMETICA
+--(4*(f 2 1))(f 2 2)
+--DEFINICIÓN F
+--(4*(cuadrado(f 2 0)))(f 2 2)
+--DEFINICIÓN CUADRADO
+--(4*((f 2 0)(f 2 0)))(f 2 2)
+--DEFINICIÓN F
+--(4*2*(f 2 0))(f 2 2)
+--ARITMETICA
+--(8*(f 2 0))(f 2 2)
+--DEFINICIÓN F
+--(8*2)(f 2 2)
+--ARITMETICA
+--16*(f 2 2)
+--DEFINICIÓN F
+--16*(cuadrado (f 2 1))
+--DEFINICIÓN CUADRADO
+--16*((f 2 1)(f 2 1))
+--DEFINICIÓN F
+--16*((cuadrado (f 2 0))(f 2 1))
+--DEFINICIÓN CUADRADO
+--16*((f 2 0)(f 2 0))(f 2 1))
+--DEFINICIÓN F
+--16*(2*(f 2 0))(f 2 1))
+--DEFINICIÓN F
+--16*((2*2)(f 2 1))
+--ARITMETICA
+--16*(4*(f 2 1))
+--DEFINICIÓN F
+--16*(4*(cuadrado(f 2 0)))
+--DEFINICIÓN CUADRADO
+--16*(4*((f 2 0)(f 2 0)))
+--DEFINICIÓN F
+--16*(4*(2*(f 2 0)))
+--DEFINICIÓN F
+--16*(4*(2*2))
+--ARITMETICA
+--16*(4*4)
+--ARITMETICA
+--16*16
+--ARITMETICA
+--256
+--Cantidad de reducciones: 29
+
+--4
+--square :: Int -> Int
+--square x = x*x
+--
+--inf :: Int
+--inf = inf+1
+--
+--APLICATIVO
+--square.inf
+--DEFINICIÓN INF
+--square(inf+1)
+--DEFINICIÓN INF
+--square((inf+1)+1)
+-- ...
+--Cantidad de reducciones: Infinitas
+--
+--NORMAL
+--square.inf
+--DEFINICIÓN SQUARE
+--inf.inf
+--DEFINICIÓN INF
+--(inf+1).inf
+--DEFINICIÓN INF
+--((inf+1)+1).inf
+-- ...
+--Cantidad de reducciones: Infinitas
+
+--5
+--LAZY
+--f.2.3
+--DEFINICIÓN F
+--cuadrado(f 2 2)
+--  [cuadrado = x*x]
+--x*x
+--  [x = f 2 2]
+--DEFINICIÓN F
+--(cuadrado (f 2 1))*x
+--  [y = f 2 1]
+--(y*y)*x
+--DEFINICIÓN F
+--((cuadrado (f 2 0))*y)*x
+--  [z = f 2 0]
+--((z*z)*y)*x
+--Z = 2
+--((2*z)*y)*x
+--Z = 2
+--((2*2)*y)*x
+--ARITMETICA
+--(4*y)*x
+--Y= Z*Z
+--(4*(2*2))*x
+--ARITMETICA
+--(4*4)*x
+--ARITMETICA
+--16*x
+--X= Y*Y
+--16*(4*4)
+--ARITMETICA
+--16*16
+--ARITMETICA
+--256
+--Cantidad de reducciones: 16
+
+--6
+--Se puede cambiar el orden evaluativo de Haskell pero solo temporalmente con el
+-- $!, esto puede servir para obligar a evaluar ciertas expresiones.
+-- EJ: f $! x = x+1
+
+--PRÁCTICO 5--
+--1
+--[1..]
+
+listInf :: [Int]
+listInf = [1..]
+
+--2
+listInfN :: Int -> [Int]
+listInfN n = [n..]
+
+--3
+listHastaN :: Int -> [Int]
+listHastaN 0 = []
+listHastaN n = [1..n]
+
+--4
+ret5 :: [Int] -> [Int]
+ret5 = take 5
+
+--5
+retCuad :: [Int] -> [Int]
+retCuad xs = map (^2) [n | n <- xs]
+
+--6
+listDivs :: Int -> [Int]
+listDivs n = filter (esDivisor n) [x | x <- [1..n]]
+esDivisor :: Int -> Int -> Bool
+esDivisor n x
+    | mod n x == 0 = True
+    | otherwise = False
+
+--7
+primosInt :: [Int] -> [Int]
+primosInt (x:xs) = filter esPrimo2 (x:xs)
+esPrimo2 :: Int -> Bool
+esPrimo2 n
+    | length [x | x <- [1..n], mod n x == 0] > 2 = False
+    | otherwise = True
+
+--8
+sumCuads :: [Int] -> Int
+sumCuads xs = sum(map (^2) xs)
+
+--9
+sucesores :: [Int] -> [Int]
+sucesores xs = map (+1) xs
+
+--10
+sumar :: [Int] -> Int
+sumar xs = foldr (+) 0 xs 
+
+--11
+factF :: Int -> Int
+factF n = foldr (*) 1 [1..n]
+
+--12
+andF :: [Bool] -> Bool
+andF xs = foldr (&&) True xs
+
+--13
+op :: a -> Int
+op n = 1
+tamFl :: [a] -> Int
+tamFl xs = foldl (+) 0 (map (op) xs)
+tamFr :: [a] -> Int
+tamFr xs = foldr (+) 0 (map (op) xs)
+
+--14
+sucesoresL :: [Int] -> [Int]
+sucesoresL xs = [n+1 | n <- xs]
+
+--15
+cuadradosL :: [Int] -> [Int]
+cuadradosL xs = [n^2 | n <- xs]
+
+--16
+may10 :: [Int] -> [Int]
+may10 xs = [i | i <- xs, i > 10]
+
+--17
+divisoresL :: Int -> [Int]
+divisoresL n = [i | i <- [1..n], mod n i == 0]
+
+--18
+todosOcurrenEn2 :: Eq a => [a] -> [a] -> Bool
+todosOcurrenEn2 [] _ = False
+todosOcurrenEn2 _ [] = False
+todosOcurrenEn2 xs ys = and [elem n ys | n <- xs]
+
+--19
+primos2N :: Int -> [Int]
+primos2N n = 1:[i | i <- [2..n], esPrimo(i)]
+
+--20
+prodCart :: [Int] -> [Int] -> [(Int, Int)]
+prodCart xs ys = [(n,m) | n <- xs, m <- ys]
+
+--21
+ocurrenciasX :: Eq a => [a] -> a -> Int
+ocurrenciasX xs n = length [1 | i <- xs, i == n]
+
+--22
+split4 :: [a] -> [([a],[a])]
+split4 xs = [(take n xs, drop n xs) | n <- [0..length xs]]
+
+--23
+sumaSeg2 :: [Int] -> Int
+sumaSeg2 xs = sum [sum (take i xs) | i <- [0..length xs]]
+
+--24
+infPares2 :: [Int]
+infPares2 = [i | i <- [0..], mod i 2 == 0]
+
+--Práctico 6--
+--1
+data Nat = Zero | Succ Nat deriving Show
+
+--2
+natToInt2 :: Nat -> Int
+natToInt2 Zero = 0
+natToInt2 (Succ n) = 1+natToInt2 n
+
+--3
+intToNat2 :: Int -> Nat
+intToNat2 0 = Zero
+intToNat2 n = Succ (intToNat2 (n-1))
+
+--4
+sumaNat :: Nat -> Nat -> Nat
+sumaNat n m = intToNat2((natToInt2 n)+(natToInt2 m))
+
+--5
+data BinTree a = Nill | Node (BinTree a) a (BinTree a) deriving Show
+
+--6
+sizeTree :: BinTree a -> Int
+sizeTree Nill = 0
+sizeTree (Node izq n der) = 1+sizeTree izq+sizeTree der
+
+--7
+heightTree :: BinTree a -> Int
+heightTree Nill = 0
+heightTree (Node izq n der) = 1+max (heightTree izq) (heightTree der)
