@@ -610,3 +610,320 @@ sizeTree (Node izq n der) = 1+sizeTree izq+sizeTree der
 heightTree :: BinTree a -> Int
 heightTree Nill = 0
 heightTree (Node izq n der) = 1+max (heightTree izq) (heightTree der)
+
+--Práctico 7--
+--1
+-- (P -> Q) v (Q -> P) ≡ True
+--      P -> Q ≡ -P v Q
+-- -P v Q v -Q v P
+--      CONMUTATIVA v
+-- -P v P v -Q v Q
+--      TERCERO EXCLUIDO
+-- TRUE v TRUE
+--      ABSORCIÓN
+-- TRUE
+
+-- P -> Q ≡ -P v Q
+--      DEFINICIÓN ->
+-- P v Q ≡ Q
+--      NEUTRO PARA v
+-- P v Q ≡ Q v False
+--      CONMUTATIVA DE v
+-- Q v P ≡ Q v False
+--      (A v B) ≡ (A v C) ≡ A v (B ≡ C)
+-- Q v (P ≡ False)
+--      CONTRAPOSICIÓN DE P
+-- Q v -P
+--      CONMUTATIVA DE v
+-- -P v Q
+
+-- P v (P ∧ Q) ≡ P
+--      DISTRIBUTIVA v
+-- (P v P) ∧ (P v Q) ≡ P
+--      IDEMPOTENCIA
+-- P ∧ (P v Q) ≡ P
+--      REGLA DORADA
+-- (P v Q) ≡ (P v Q) v P
+--      DISTRIBUTIVA v
+-- (P v Q) ≡ (P v P) v (P v Q)
+--      IDEMPOTENCIA
+-- P v Q ≡ P v Q
+
+--2
+-- A ≡ A ∧ -B
+--      REGLA DORADA
+-- -B ≡ -B v A
+--      CONMUTATIVA v Y SIMETRIA
+-- A v -B ≡ B
+--      DEFINICIÓN ->
+-- A -> -B
+-- Quiere decir que si A es caballero entonces B es mentiroso.
+-- Se puede seguir disminuyendo la expresión.
+--
+--      P -> Q ≡ -P v Q
+-- -A v -B
+--      DE MORGAN v
+-- -(A ∧ B)
+
+-- A ≡ -A ∧ B
+--      REGLA DORADA
+-- A ≡ -A ≡ B ≡ B v -A
+--      ASOCIATIVA ≡
+-- (A ≡ -A) ≡ B ≡ B v -A
+--      CONTRAPOSITIVA
+-- FALSE ≡ B ≡ B v -A
+--      ASOCIATIVA ≡
+-- (FALSE ≡ B) ≡ B v -A
+--      CONTRAPOSITIVA
+-- -B ≡ B v -A
+--      (-A ≡ B) ≡ -(A ≡ B)
+-- -(B ≡ B v -A)
+--      NEUTRO v
+-- -(B v FALSE ≡ B v -A)
+--      (A v B) = (A v C) = A v (B ≡ C)
+-- -(B v (FALSE ≡ B v -A))
+--      CONTRAPOSITIVA
+-- -(B v -(B v -A))
+--      DISTRIBUTIVA -
+-- -B v -B v A
+--      IDEMPOTENCIA
+-- -B v A
+-- Esto quiere decir que A es un caballero o B es un mentiroso.
+--
+-- INTENTO DE NUEVO POR QUE NO ESTOY SEGURO DE -
+-- A ≡ -A ∧ B
+--      REGLA DORADA
+-- A ≡ -A ≡ B ≡ B v -A
+--      ASOCIATIVA ≡
+-- (A ≡ -A) ≡ B ≡ B v -A
+--      CONTRAPOSITIVA
+-- FALSE ≡ B ≡ B v -A
+--      ASOCIATIVA ≡
+-- (FALSE ≡ B) ≡ B v -A
+--      CONTRAPOSITIVA
+-- -B ≡ B v -A
+--      REGLA DORADA
+-- -B ≡ B ≡ -A ≡ -A v B
+--      ASOCIATIVA ≡
+-- (-B ≡ B) ≡ -A ≡ -A v B
+--      CONTRAPOSITIVA
+-- FALSE ≡ -A ≡ -A v B
+--      ASOCIATIVA Y NEUTRO v
+-- FALSE ≡ (-A v FALSE ≡ (-A v B))
+--      (A v B) ≡ (A v C) ≡ A v (B ≡ C)
+-- FALSE ≡ A v (FALSE ≡ B)
+--      CONTRAPOSITIVA
+-- FALSE ≡ A v -B
+--      CONTRAPOSITIVA
+-- -(A v -B)
+--      DISTRIBUTIVA -
+-- -A v B
+-- Esto quiere decir que A es un mentiroso o B es un caballero
+
+-- A ≡ A ∧ B
+--      SIMETRIA
+-- A ∧ B ≡ A
+--      REGLA DORADA
+-- B ≡ B v A
+--      NEUTRO v
+-- B v FALSE ≡ B v A
+--      (A v B) ≡ (A v C) ≡ A v (B ≡ C)
+-- B v (FALSE ≡ A)
+--      CONTRAPOSITIVA
+-- B v -A
+-- Esto quiere decir que B es caballero o A es mentiroso
+
+-- A ≡ -A v -B
+--      REGLA DORADA
+-- A ≡ -A ∧ -B ≡ -A ≡ -B
+--      SIMETRIA Y ASOCIATIVA ≡
+-- (A ≡ -A) ≡ -B ≡ -A ∧ -B
+--      CONTRAPOSITIVA
+-- FALSE ≡ -B ≡ -A ∧ -B
+--      SIMETRIA
+-- FALSE ≡ -A ∧ -B ≡ -B
+--      REGLA DORADA (A ∧ B ≡ B ≡ A ≡ B v A)
+-- FALSE ≡ -A ≡ -B v -A
+--      NEUTRO Y CONMUTATIVA v
+-- FALSE ≡ -A v FALSE ≡ -A v -B
+--      (A v B) ≡ (A v C) ≡ A v (B ≡ C)
+-- FALSE ≡ -A v (FALSE ≡ -B)
+--      CONTRAPOSITIVA
+-- FALSE ≡ -A v B
+--      CONTRAPOSITIVA
+-- A v -B
+-- Esto quiere decir que A es caballero o B es mentiroso.
+
+-- A ≡ -A v B
+--      REGLA DORADA
+-- A ≡ B ≡ -A ≡ -A ∧ B
+--      SIMETRIA Y ASOCIATIVA
+-- (A ≡ -A) ≡ B ≡ -A ∧ B
+--      CONTRAPOSITIVA
+-- FALSE ≡ B ≡ -A ∧ B
+--      REGLA DORADA (A y B ≡ B ≡ A ≡ B v A)
+-- FALSE ≡ -A ≡ B v -A
+--      NEUTRO Y CONMUTATIVA v
+-- FALSE ≡ -A v FALSE ≡ -A v B
+--      (A v B) ≡ (A v C) ≡ A v (B ≡ C)
+-- FALSE ≡ -A v (FALSE ≡ B)
+--      CONTRAPOSITIVA
+-- FALSE ≡ -A v -B
+--      CONTRAPOSITIVA
+-- A v B
+-- Esto quiere decir que A o B es un caballero.
+
+-- A ≡ A -> S -> S
+--      DEFINICIÓN ->
+-- A ≡ A -> (S v S ≡ S)
+--      IDEMPOTENCIA Y NEUTRO ≡
+-- A ≡ A -> S
+--      DEFINICIÓN ->
+-- A ≡ A v S ≡ S
+--      NEUTRO Y CONMUTATIVA v
+-- A ≡ S v A ≡ S v FALSE
+--      (A v B) ≡ (A v C) ≡ A v (B ≡ C)
+-- A ≡ S v (A ≡ FALSE)
+--      CONTRAPOSITIVA
+-- A ≡ S v -A
+--      REGLA DORADA
+-- A ≡ S ≡ -A ≡ A y S
+--      SIMETRIA Y ASOCIATIVA ≡
+-- (A ≡ -A) ≡ S ≡ A y S
+--      CONTRAPOSITIVA
+-- FALSE ≡ S ≡ A y S
+--      REGLA DORADA
+-- FALSE ≡ A ≡ S v A
+--      NEUTRO Y CONMUTATIVA v
+-- FALSE ≡ A v FALSE ≡ A v S
+--      (A v B) ≡ (A v C) ≡ A v (B ≡ C)
+-- FALSE ≡ A v (FALSE ≡ S)
+--      CONTRAPOSITIVA
+-- FALSE ≡ A v -S
+--      CONTRAPOSITIVA
+-- -A v S
+-- Esto quiere decir que A es mentiroso o se come el sombrero.
+
+--EJERCICIOS EXTRAS PASADOS POR SLACK--
+--1.a
+f :: Int -> [Int] -> Bool
+f n [] = False
+f 0 xs = False
+f n xs = sum [1 | i <- [0..n-1], j <- take (n-1) xs, i == j, count j xs > 1] > 0
+    where count x xs = length(filter (==x) xs)
+    
+--1.b
+--
+
+--1.c
+--
+
+--2
+--Dado las definiciones:
+--K.x.y = x
+--inf = inf+1
+--
+--NORMAL
+--K.3.inf
+--  DEFINICIÓN K
+--3
+--
+--APLICATIVA
+--K.3.inf
+--  DEFINICIÓN inf
+--K.3.(inf+1)
+--  DEFINICIÓN inf
+--K.3.((inf+1)+1)
+-- ...
+
+--3.a
+data BinTreeHoja a = Hoja | Nodo (BinTreeHoja a) a (BinTreeHoja a) deriving Show
+
+--3.b
+cantHojas :: (BinTreeHoja a) -> Int
+cantHojas Hoja = 1
+cantHojas (Nodo izq n Hoja) = 1+cantHojas izq
+cantHojas (Nodo Hoja n der) = 1+cantHojas der
+cantHojas (Nodo izq n der) = cantHojas izq+cantHojas der
+
+--4, ANALIZAR POR QUE ANDA PERO NO ENTENDI BIEN POR QUE
+darCoordDiagonalmente :: [(Int,Int)]
+darCoordDiagonalmente = [(j,i-j) | i <- [0..6], j <- [0..i], i>=j]
+
+coordSolo = [(i,j) | i <- [0..6], j <- [0..i], i == j]
+
+matrizPares = [(i,j) | i <- [0..10], j <- [0..i], mod i 2 == 0, mod j 2 == 0]
+
+matrizMult3 = (1,1):[(i,j) | i <- [1..10], mod i 3 == 0, j <- [1..i], mod j 3 == 0]
+
+--5
+--5.a
+--square x = x*x
+--
+--inf = inf+1
+--
+--and true true = true
+--and true false = false
+--and false true = false
+--and false false = false
+--
+--APLICATIVO
+--and ((square 2) == 5)(inf == inf)
+--  DEFINICIÓN square
+--and ((2*2) == 5)(inf == inf)
+--  ARITMETICA
+--and (4 == 5)(inf == inf)
+--  4 == 5
+--and FALSE*(inf == inf)
+--  DEFINICIÓN inf
+--and FALSE*(inf+1 == inf)
+--  DEFINICIÓN inf
+--and FALSE*((inf+1)+1 == inf)
+--  ...
+--
+--NORMAL
+--and ((square 2) == 5)(inf == inf)
+--  DEFINICIÓN square
+--and ((2*2) == 5)(inf == inf)
+--  ARITMETICA
+--and (4 == 5)(inf == inf)
+--  4 == 5
+--and FALSE*(inf == inf)
+--  DEFINICIÓN inf
+--and FALSE*(inf+1 == inf)
+--  DEFINICIÓN inf
+--and FALSE*((inf+1)+1 == inf)
+--  ...
+
+--5.b
+--square x = x*x
+--
+--inf = inf+1
+--
+--and true n = n
+--and false n = false
+--
+--APLICATIVO
+--and ((square 2) == 5)(inf == inf)
+--  DEFINICIÓN square
+--and ((2*2) == 5)(inf == inf)
+--  ARITMETICA
+--and (4 == 5)(inf == inf)
+--  4 == 5
+--and FALSE*(inf == inf)
+--  DEFINICIÓN inf
+--and FALSE*(inf+1 == inf)
+--  DEFINICIÓN inf
+--and FALSE*((inf+1)+1 == inf)
+--  ...
+--
+--NORMAL
+--and ((square 2) == 5)(inf == inf)
+--  DEFINICIÓN square
+--and ((2*2) == 5)(inf == inf)
+--  ARITMETICA
+--and (4 == 5)(inf == inf)
+--  4 == 5
+--and FALSE*(inf == inf)
+--  DEFINICIÓN and
+--FALSE
