@@ -643,9 +643,9 @@ heightTree (Node izq n der) = 1+max (heightTree izq) (heightTree der)
 --      IDEMPOTENCIA
 -- P ∧ (P v Q) ≡ P
 --      REGLA DORADA
--- (P v Q) ≡ (P v Q) v P
---      DISTRIBUTIVA v
--- (P v Q) ≡ (P v P) v (P v Q)
+-- P v Q ≡ (P v Q) v P
+--      ASOCIATIVA
+-- P v Q ≡ (P v P) v Q
 --      IDEMPOTENCIA
 -- P v Q ≡ P v Q
 
@@ -927,3 +927,169 @@ matrizMult3 = (1,1):[(i,j) | i <- [1..10], mod i 3 == 0, j <- [1..i], mod j 3 ==
 --and FALSE*(inf == inf)
 --  DEFINICIÓN and
 --FALSE
+
+--PRÁCTICA DE PARCIAL 1--
+--1
+f1 :: BinTree Int -> Int
+f1 Nill = 0
+f1 (Node Nill n Nill) = n
+f1 (Node izq n Nill) = n+f1 izq
+f1 (Node Nill n der) = n+f1 der
+f1 (Node izq n der) = n+f1 izq+f1 der
+
+--2
+data SIntExp = Cte Int | Sum SIntExp SIntExp | Mul SIntExp SIntExp deriving Show
+
+--Sum (Cte 5) (Cte 5)
+--Mul (Cte 0) (Cte 1)
+--Cte 111
+--Sum (Mul (Cte 2) (Cte 5)) (Cte 7)
+
+--Sum (Cte 4) (Mul (Cte 3) (Cte 0))
+
+--3
+compact :: [Int] -> [Int]
+compact [] = []
+compact [x] = [x]
+compact (x:xs) = if x == head xs then compact xs else x:compact xs
+
+-- compact [4,3,0,6,2,6,8,2]
+--      [compact (x:xs) -> (x == head xs) = compact xs
+--                         otherwise = x:compact xs]
+--      DEFINICIÓN COMPACT
+-- (4:compact [3,0,6,2,6,8,2])
+--      DEFINICIÓN COMPACT
+-- (4:3:compact [0,6,2,6,8,2])
+--      DEFINICIÓN COMPACT
+-- (4:3:0:compact [6,2,6,8,2])
+--      DEFINICIÓN COMPACT
+-- (4:3:0:6:compact [2,6,8,2])
+--      DEFINICIÓN COMPACT
+-- (4:3:0:6:2:compact [6,8,2])
+--      DEFINICIÓN COMPACT
+-- (4:3:0:6:2:6:compact [8,2])
+--      DEFINICIÓN COMPACT
+-- (4:3:0:6:2:6:8:compact [2])
+--      [compact [x] = [x]]
+--      DEFINICIÓN COMPACT
+-- (4:3:0:6:2:6:8:2)
+--      
+
+--4.1
+--NORMAL
+--(square inf)+(square inf)
+--  DEFINICIÓN SQUARE
+--(inf*inf)+(square inf)
+--  DEFINICIÓN INF
+--((inf+1)*inf)+(square inf)
+--  DEFINICIÓN INF
+-- (((inf+1)+1)*inf)(square inf)
+-- ..., se va al infinito
+--square 2
+--APLICATIVO
+--(square inf)+(square inf)
+--  DEFINICIÓN SQUARE
+--(inf*inf)+(square inf)
+--  DEFINICIÓN INF
+--(inf*(inf+1))+(square inf)
+--  ..., se va al infinito
+
+--4.2
+--NORMAL
+--and(inf == inf) ((square 2) == 4)
+--  DEFINICIÓN INF
+--and((inf+1) == inf) ((square 2) == 4)
+--  DEFINICIÓN INF
+--and(((inf+1)+1) == inf) ((square 2) == 4)
+--  ..., se va al infinito
+--
+--APLICATIVO
+--and(inf == inf) ((square 2) == 4)
+--  DEFINICIÓN INF
+--and((inf+1) == inf) ((square 2) == 4)
+--  DEFINICIÓN INF
+--and(((inf+1)+1) == inf) ((square 2) == 4)
+--  ..., se va al infinito
+
+--PRÁCTICA DE PARCIAL 2--
+--1
+-- imp :: Bool -> Bool -> Bool
+-- imp True False = False
+-- imp n m = True
+--
+--1.a
+--NORMAL
+-- imp (inf == inf) (inf == inf)
+--      DEFINICIÓN INF
+-- imp (inf+1 == inf) (inf == inf)
+--      DEFINICIÓN INF
+-- imp ((inf+1)+1 == inf) (inf == inf)
+-- ..., se va al infinito
+--
+--APLICATIVO
+-- imp (inf == inf) (inf == inf)
+--      DEFINICIÓN INF
+-- imp (inf+1 == inf) (inf == inf)
+--      DEFINICIÓN INF
+-- imp ((inf+1)+1 == inf) (inf == inf)
+-- ..., se va al infinito
+--
+--1.b
+--NORMAL
+-- imp (inf == 5) True
+--      DEFINICIÓN INF
+-- imp (inf+1 == 5) True
+--      DEFINICIÓN INF
+-- imp ((inf+1)+1 == 5) True
+--  ..., se va al infinito
+--
+--APLICATIVO
+-- imp (inf == 5) True
+--      DEFINICIÓN INF
+-- imp (inf+1 == 5) True
+--      DEFINICIÓN INF
+-- imp ((inf+1)+1 == 5) True
+--  ..., se va al infinito
+--
+--1.c
+--NORMAL
+-- imp False (inf == inf)
+--      DEFINICIÓN IMP
+-- True
+--
+--APLICATIVO
+-- imp False (inf == inf)
+--      DEFINICIÓN INF
+-- imp False (inf+1 == inf)
+--      DEFINICIÓN INF
+-- imp False ((inf+1)+1 == inf)
+--  ..., se va al infinito
+
+--2
+--intToNat 0 = Zero
+--intToNat n = Succ (intToNat (n-1))
+--
+--natToInt Zero = 0
+--natToInt (Succ n) = 1+natToInt(n)
+--
+--2.a
+--sum :: Nat -> Nat -> Nat
+--sum n m = intToNat((natToInt(n))+(natToInt(m)))
+--
+--2.b
+--mult :: Nat -> Nat -> Nat
+--mult n m = intToNat((natToInt(n))*(natToInt(m)))
+--
+--2.c
+--par :: Nat -> Bool
+--par n = mod (natToInt(n)) 2 == 0
+
+--3
+flatten2 :: [[a]] -> [a]
+flatten2 [] = []
+flatten2 [x] = x
+flatten2 (x:xs) = x ++ flatten2 xs
+
+--4
+count2 :: [Int] -> Int -> Int
+count2 xs n = sum [1 | i <- xs, i == n]
