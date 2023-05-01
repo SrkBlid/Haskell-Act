@@ -1,4 +1,4 @@
---PRÁCTICO 1--
+-------------------------PRÁCTICO 1-------------------------
 
 --2
 --head(tail("hola mundo"))
@@ -23,7 +23,7 @@ list n = list (div n 10) ++ [mod n 10]
 --9
 --reverse("olo") == "olo"
 
---PRÁCTICO 2--
+-------------------------PRÁCTICO 2-------------------------
 
 --2
 hd :: [a] -> a
@@ -150,7 +150,7 @@ raicesR a b c =
         else
                 2
 
---PRÁCTICO 3--
+-------------------------PRÁCTICO 3-------------------------
 
 --1
 mergeLT :: Ord a => [a] -> [a] -> [(a, a)]
@@ -256,7 +256,7 @@ compact2 (x:xs)
     | x == head(xs) = compact2 xs
     | otherwise = x:compact2 xs
 
---PRÁCTICO 4--
+-------------------------PRÁCTICO 4-------------------------
 
 --1
 --cuadrado :: Int -> Int
@@ -466,7 +466,7 @@ compact2 (x:xs)
 -- $!, esto puede servir para obligar a evaluar ciertas expresiones.
 -- EJ: f $! x = x+1
 
---PRÁCTICO 5--
+-------------------------PRÁCTICO 5-------------------------
 --1
 --[1..]
 
@@ -611,7 +611,7 @@ heightTree :: BinTree a -> Int
 heightTree Nill = 0
 heightTree (Node izq n der) = 1+max (heightTree izq) (heightTree der)
 
---Práctico 7--
+-------------------------Práctico 7-------------------------
 --1
 -- (P -> Q) v (Q -> P) ≡ True
 --      P -> Q ≡ -P v Q
@@ -650,6 +650,7 @@ heightTree (Node izq n der) = 1+max (heightTree izq) (heightTree der)
 -- P v Q ≡ P v Q
 
 --2
+--2.1
 -- A ≡ A ∧ -B
 --      REGLA DORADA
 -- -B ≡ -B v A
@@ -659,38 +660,12 @@ heightTree (Node izq n der) = 1+max (heightTree izq) (heightTree der)
 -- A -> -B
 -- Quiere decir que si A es caballero entonces B es mentiroso.
 -- Se puede seguir disminuyendo la expresión.
---
 --      P -> Q ≡ -P v Q
 -- -A v -B
 --      DE MORGAN v
 -- -(A ∧ B)
 
--- A ≡ -A ∧ B
---      REGLA DORADA
--- A ≡ -A ≡ B ≡ B v -A
---      ASOCIATIVA ≡
--- (A ≡ -A) ≡ B ≡ B v -A
---      CONTRAPOSITIVA
--- FALSE ≡ B ≡ B v -A
---      ASOCIATIVA ≡
--- (FALSE ≡ B) ≡ B v -A
---      CONTRAPOSITIVA
--- -B ≡ B v -A
---      (-A ≡ B) ≡ -(A ≡ B)
--- -(B ≡ B v -A)
---      NEUTRO v
--- -(B v FALSE ≡ B v -A)
---      (A v B) = (A v C) = A v (B ≡ C)
--- -(B v (FALSE ≡ B v -A))
---      CONTRAPOSITIVA
--- -(B v -(B v -A))
---      DISTRIBUTIVA -
--- -B v -B v A
---      IDEMPOTENCIA
--- -B v A
--- Esto quiere decir que A es un caballero o B es un mentiroso.
---
--- INTENTO DE NUEVO POR QUE NO ESTOY SEGURO DE -
+--2.2
 -- A ≡ -A ∧ B
 --      REGLA DORADA
 -- A ≡ -A ≡ B ≡ B v -A
@@ -720,6 +695,7 @@ heightTree (Node izq n der) = 1+max (heightTree izq) (heightTree der)
 -- -A v B
 -- Esto quiere decir que A es un mentiroso o B es un caballero
 
+--2.3
 -- A ≡ A ∧ B
 --      SIMETRIA
 -- A ∧ B ≡ A
@@ -733,6 +709,7 @@ heightTree (Node izq n der) = 1+max (heightTree izq) (heightTree der)
 -- B v -A
 -- Esto quiere decir que B es caballero o A es mentiroso
 
+--2.4
 -- A ≡ -A v -B
 --      REGLA DORADA
 -- A ≡ -A ∧ -B ≡ -A ≡ -B
@@ -754,6 +731,7 @@ heightTree (Node izq n der) = 1+max (heightTree izq) (heightTree der)
 -- A v -B
 -- Esto quiere decir que A es caballero o B es mentiroso.
 
+--2.5
 -- A ≡ -A v B
 --      REGLA DORADA
 -- A ≡ B ≡ -A ≡ -A ∧ B
@@ -773,6 +751,7 @@ heightTree (Node izq n der) = 1+max (heightTree izq) (heightTree der)
 -- A v B
 -- Esto quiere decir que A o B es un caballero.
 
+--2.6
 -- A ≡ A -> S -> S
 --      DEFINICIÓN ->
 -- A ≡ A -> (S v S ≡ S)
@@ -804,7 +783,7 @@ heightTree (Node izq n der) = 1+max (heightTree izq) (heightTree der)
 -- -A v S
 -- Esto quiere decir que A es mentiroso o se come el sombrero.
 
---EJERCICIOS EXTRAS PASADOS POR SLACK--
+-------------------------EJERCICIOS EXTRAS PASADOS POR SLACK-------------------------
 --1.a
 f :: Int -> [Int] -> Bool
 f n [] = False
@@ -928,7 +907,7 @@ matrizMult3 = (1,1):[(i,j) | i <- [1..10], mod i 3 == 0, j <- [1..i], mod j 3 ==
 --  DEFINICIÓN and
 --FALSE
 
---PRÁCTICA DE PARCIAL 1--
+-------------------------PRÁCTICA DE PARCIAL 1-------------------------
 --1
 f1 :: BinTree Int -> Int
 f1 Nill = 0
@@ -1011,7 +990,7 @@ compact (x:xs) = if x == head xs then compact xs else x:compact xs
 --and(((inf+1)+1) == inf) ((square 2) == 4)
 --  ..., se va al infinito
 
---PRÁCTICA DE PARCIAL 2--
+-------------------------PRÁCTICA DE PARCIAL 2-------------------------
 --1
 -- imp :: Bool -> Bool -> Bool
 -- imp True False = False
@@ -1093,3 +1072,110 @@ flatten2 (x:xs) = x ++ flatten2 xs
 --4
 count2 :: [Int] -> Int -> Int
 count2 xs n = sum [1 | i <- xs, i == n]
+
+-------------------------PRÁCTICA PERSONAL-------------------------
+
+reverseTree :: BinTree a -> BinTree a
+reverseTree (Node Nill n Nill) = Node Nill n Nill
+reverseTree (Node Nill n der) = Node (reverseTree der) n Nill
+reverseTree (Node izq n Nill) = Node Nill n (reverseTree izq)
+reverseTree (Node izq n der) = Node (reverseTree der) n (reverseTree izq)
+
+tamTree :: BinTree a -> Int
+tamTree Nill = 0
+tamTree (Node izq n der) = 1+tamTree izq +tamTree der
+
+alturaTree :: BinTree a -> Int
+alturaTree Nill = 0
+alturaTree (Node izq n der) = max (alturaTree izq+1) (alturaTree der+1)
+
+cantNills :: BinTree a -> Int
+cantNills Nill = 1
+cantNills (Node Nill n der) = 1+cantNills der
+cantNills (Node izq n Nill) = 1+cantNills izq
+cantNills (Node izq n der) = cantNills izq + cantNills der
+
+sumaValTree :: Num a => BinTree a -> a
+sumaValTree (Node Nill n Nill) = n
+sumaValTree (Node izq n Nill) = n+sumaValTree izq
+sumaValTree (Node Nill n der) = n+sumaValTree der
+sumaValTree (Node izq n der) = n+sumaValTree izq+sumaValTree der
+
+--foldl: toma una función, un acumulador (neutro) y una lista. 
+--       Evalua de izquierda a derecha.
+--       foldl :: (b -> a -> b) -> b -> [a] -> b
+--       EJ: foldl (+) 0 [1,2,3,4]
+--           (((0+1)+2)+3)+4
+--
+--foldr: toma una función, un acumulador (neutro) y una lista.
+--       Evalua de derecha a izquierda.
+--       foldr :: (a -> b -> b) -> b -> [a] -> b
+--       EJ: foldr (+) 0 [1,2,3,4]
+--           1+(2+(3+(4+0)))
+
+--Diferencias entre foldl y foldr
+-- ●DIRECCIÓN: foldl evalua de izquierda a derecha, foldr de derecha a izquierda.
+--      foldl suma el acumulador (neutro) al primer elemento de la lista y seguira
+--      con el segundo elemento de la lista, mientras que foldr sumara el acumulador
+--      (neutro) con el último elemento de la lista y con el resultado de esto
+--      seguira con el penúltimo elemento.
+-- ●TIPO DE PLEGADO: foldl tiene plegado estricto, esto quiere decir que se evaluan
+--      todos los elementos de la lista antes de comenzar a plegarla, lo cual
+--      impactara mucho en el rendimiento al utilizar listas grandes.
+--      Mientras que foldr es de plegado perezoso, lo que quiere decir que solo se
+--      evalua el elemento actual de la lista cuando es necesario para la evaluación
+--      de la función acumuladora.
+-- ●LISTAS INFINITAS: foldl no podria realizar una lista infinita debido a que tendria
+--      que primero evaluar todos los elementos de la misma, a la que nunca llegaria
+--      a terminar de evaluar.
+--      Mientras que con foldr, solo es necesario que evalua su primer elemento y de
+--      ahi llegue al primer elemento de la lista.
+
+--Ventajas/Desventajas de foldl y foldr
+-- ●VENTAJAS FOLDR
+--      -Es más adecuado para trabajar con listas infinitas.
+--      -Es más eficientes cuando se puede aprovechar el plegado de derecha a
+--       izquierda, cómo cuando creamos una lista inversa.
+-- ●DESVENTAJAS FOLDR
+--      -NO se puede utilizar para estructuras de datos que no sean listas.
+--      -No es adecuado para funciones que requieren un orden de evaluación de
+--       izquierda a derecha.
+--
+-- ●VENTAJAS FOLDL
+--      -Se puede usar en estructuras de datos que no sean listas, cómo con
+--       árboles o grafos.
+--      -Puede ser más eficientes cuando se requiere una evaluación de izquierda a
+--       derecha.
+-- ●DESVENTAJAS FOLDL
+--      -No se puede utilizar para trabajar listas infinitas.
+--      -La evaluación de izquierda a derecha puede ser menos intuitiva en algunos
+--       casos.
+
+--DEFINICIONES DE ALGUNAS FUNCIONES DE ALTO ORDEN:
+--  ●map :: (a -> b) -> [a] -> [b]
+--      (a -> b) = dado un a, devuelve b que es un a modificado
+--      map (*2) [1,2,3] = [2,4,6]
+--
+--  ●filter :: (a -> Bool) -> [a] -> [a]
+--      (a -> Bool) = dado un a, devuelve un Booleano si cumplea una condición
+--      filter (==2) [1,2,3,2] = [2,2]
+--
+--  ●zip :: [a] -> [b] -> [(a,b)]
+--      zip [1,2,3] [4,5,6] = [(1,4), (2,5), (3,6)]
+--
+
+matriz5 = [(i,j) | i <- [0..5], j <- [0..10]]
+diagMatriz = [(i,i) | i <- [0..5]]
+diagMatriz2 = [(i,j) | i <- [0..5], j <- [0..10], i == j]
+abajoDiag = [(i,j) | i <- [0..5], j <- [0..10], i > j]
+arribaDiag = [(i, j) | i <- [0..5], j <- [0..10], i < j]
+todosDivs = [(i,j) | i <- [0..5], j <- [0..10], j /= 0 && i /= 0 && mod i j == 0]
+pares = [(i,j) | i <- [0..5], even i, j <- [0..10], even j]
+
+--FUNCIONES LAMBDA
+-- Son funciones inline, es decir, que pueden ser usadas cómo argumento o expresión
+-- en otra función sin la necesidad de definirlas.
+-- Sintaxis: (\argumentos -> cuerpo de la función)
+--
+-- EJ: suma x y = x+y
+--     suma = \x y -> x+y
