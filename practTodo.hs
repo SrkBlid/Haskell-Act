@@ -1089,11 +1089,12 @@ alturaTree :: BinTree a -> Int
 alturaTree Nill = 0
 alturaTree (Node izq n der) = max (alturaTree izq+1) (alturaTree der+1)
 
-cantNills :: BinTree a -> Int
-cantNills Nill = 1
-cantNills (Node Nill n der) = 1+cantNills der
-cantNills (Node izq n Nill) = 1+cantNills izq
-cantNills (Node izq n der) = cantNills izq + cantNills der
+--Hoja -> Nill n Nill
+cantHojas2 :: BinTree a -> Int
+cantHojas2 (Node Nill n Nill) = 1
+cantHojas2 (Node Nill n der) = 1+cantHojas2 der
+cantHojas2 (Node izq n Nill) = 1+cantHojas2 izq
+cantHojas2 (Node izq n der) = cantHojas2 izq + cantHojas2 der
 
 sumaValTree :: Num a => BinTree a -> a
 sumaValTree (Node Nill n Nill) = n
@@ -1153,24 +1154,38 @@ sumaValTree (Node izq n der) = n+sumaValTree izq+sumaValTree der
 
 --DEFINICIONES DE ALGUNAS FUNCIONES DE ALTO ORDEN:
 --  ●map :: (a -> b) -> [a] -> [b]
---      (a -> b) = dado un a, devuelve b que es un a modificado
---      map (*2) [1,2,3] = [2,4,6]
+--   map _ [] = []
+--   map f (x:xs) = f x : map f xs
 --
 --  ●filter :: (a -> Bool) -> [a] -> [a]
---      (a -> Bool) = dado un a, devuelve un Booleano si cumplea una condición
---      filter (==2) [1,2,3,2] = [2,2]
+--   filter _ [] = []
+--   filter p (x:xs)
+--      | p x = x: filter p xs
+--      | otherwise = filter p xs
 --
 --  ●zip :: [a] -> [b] -> [(a,b)]
---      zip [1,2,3] [4,5,6] = [(1,4), (2,5), (3,6)]
---
+--   zip _ [] = []
+--   zip [] _ = []
+--   zip (x:xs) (y:ys) = [(x,y)] ++ zip xs ys
 
-matriz5 = [(i,j) | i <- [0..5], j <- [0..10]]
-diagMatriz = [(i,i) | i <- [0..5]]
-diagMatriz2 = [(i,j) | i <- [0..5], j <- [0..10], i == j]
-abajoDiag = [(i,j) | i <- [0..5], j <- [0..10], i > j]
-arribaDiag = [(i, j) | i <- [0..5], j <- [0..10], i < j]
-todosDivs = [(i,j) | i <- [0..5], j <- [0..10], j /= 0 && i /= 0 && mod i j == 0]
-pares = [(i,j) | i <- [0..5], even i, j <- [0..10], even j]
+infDiagAbajo :: [(Int, Int)]
+infDiagAbajo = [(x,x-y) | x <- [0..], y <- [0..x]]
+
+diagonalesM :: Int -> [(Int, Int)]
+diagonalesM n = [(n-i, i) | i <- [0..n]]
+matrizInfinita :: [(Int, Int)]
+matrizInfinita = concat2 [diagonalesM n | n <- [0..]]
+
+concat2 :: [[a]] -> [a]
+concat2 [] = []
+concat2 [x] = x
+concat2 (x:xs) = x ++ concat2 xs 
+
+f2 :: Int -> [Int] -> Bool
+f2 _ [] = False
+f2 0 _ = False
+f2 _ [x] = False
+f2 n xs = length [i | i <- take n xs, j <- take (n-1) xs, j == i] == n
 
 --FUNCIONES LAMBDA
 -- Son funciones inline, es decir, que pueden ser usadas cómo argumento o expresión
@@ -1179,3 +1194,8 @@ pares = [(i,j) | i <- [0..5], even i, j <- [0..10], even j]
 --
 -- EJ: suma x y = x+y
 --     suma = \x y -> x+y
+
+diagM :: Int -> [(Int, Int)]
+diagM n = [(n-i,i) | i <- [0..n]]
+infi :: [(Int, Int)]
+infi = concat2 [diagM n | n <- [0..]]
