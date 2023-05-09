@@ -29,7 +29,7 @@ paraTodo :: [Int] -> [a] -> (Int -> [a] -> Bool) -> Bool
 paraTodo [] ys f = False
 paraTodo xs ys f = and [f x ys | x <- xs]
 
-even2 :: (Integral a) => Int -> [a] -> Bool
+even2 :: Integral a => Int -> [a] -> Bool
 even2 _ [] = False
 even2 n xs
     | n > length xs-1 = error "La posición es más grande que la lista"
@@ -40,11 +40,14 @@ even2 n xs
             | n /= i = elemento n xs (i+1)
             | otherwise = x 
 
+even3 :: Integral a => Int -> [a] -> Bool
+even3 n xs = mod (xs !! n) 2 == 0
+
 existe :: [Int] -> [a] -> (Int -> [a] -> Bool) -> Bool
 existe [] ys f = False
 existe xs ys f = or [f x ys | x <- xs]
 
-odd2 :: (Integral a) => Int -> [a] -> Bool
+odd2 :: Integral a => Int -> [a] -> Bool
 odd2 _ [] = False
 odd2 n xs
     | n > length xs-1 = error "La posición es más grande que la lista"
@@ -55,4 +58,24 @@ odd2 n xs
             | n /= i = elemento n xs (i+1)
             | otherwise = x 
 
+odd3 :: Integral a => Int -> [a] -> Bool
+odd3 n xs = mod (xs !! n) 2 /= 0
+
 --4
+--sumatoria
+sumatoria :: Num a => [Int] -> [a] -> (Int -> [a] -> a) -> a
+sumatoria _ [] f = 0
+sumatoria [] _ f = 0
+sumatoria xs ys f = sum [f x ys | x <- xs]
+
+--productoria
+productoria :: Num a => [Int] -> [a] -> (Int -> [a] -> a) -> a
+productoria _ [] f = 1
+productoria [] _ f = 1
+productoria xs ys f = product [f x ys | x <- xs]
+
+--contatoria
+contatoria :: Num a => [Int] -> [a] -> (Int -> [a] -> Bool) -> Int
+contatoria _ [] f = 0
+contatoria [] _ f = 0
+contatoria xs ys f = length [1 | x <- xs, f x ys]
