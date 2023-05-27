@@ -205,9 +205,86 @@ f.(x:xs) = x ∧ f.xs
 
 ------------------------------------------------------------------------------
 --EJERCICIO 5
+f.xs = <∀i : 0 <= i < #xs-1 : xs.i <= xs.(i+1)>
+
+--CB xs = []
+xs.[]
+    [ESPECIFICACIÓN]
+<∀i : 0 <= i < #[]-1 : xs.i <= xs.(i+1)>
+    [DEF CARDINAL]
+<∀i : 0 <= i < -1 : [].i <= [].(i+1)>
+    [RANGO VACIO]
+True
+
+--CI xs = (x:xs)
+--HI = <∀i : 0 <= i < #xs-1 : xs.i <= xs.(i+1)> = f.xs
+xs.(x:xs)
+    [ESPECIFICACIÓN]
+<∀i : 0 <= i < #(x:xs)-1 : (x:xs).i <= (x:xs).(i+1)>
+    [DEF CARDINAL]
+<∀i : 0 <= i < 1+#xs-1 : (x:xs).i <= (x:xs).(i+1)>
+    [LÓGICA]
+<∀i : (0 <= i < 1) v (1 <= i < 1+#xs-1) : (x:xs).i <= (x:xs).(i+1)>
+    [PARTICIÓN DE RANGO]
+<∀i : 0 <= i < 1 : (x:xs).i <= (x:xs).(i+1)> ∧ <∀i : 1 <= i < 1+#xs-1 : (x:xs).i <= (x:xs).(i+1)>
+    [RANGO UNITARIO]
+(x:xs).0 <= (x:xs).(0+1) ∧ <∀i : 1 <= i < 1+#xs-1 : (x:xs).i <= (x:xs).(i+1)>
+    [ARITMETICA (x:xs.1), DEF POSICIÓN]
+x <= (x:xs).1 ∧ <∀i : 1 <= i < #xs : (x:xs).i <= (x:xs).(i+1)>
+    [DEF POSICIÓN]
+x <= xs.0 ∧ <∀i : 1 <= i < #xs : (x:xs).i <= xs.i>
+    [i <- i+1]
+x <= xs.0 ∧ <∀i : 1 <= i+1 < #xs : (x:xs).(i+1) <= xs.(i+1)>
+    [DEF POSICIÓN]
+x <= xs.0 ∧ <∀i : 1 <= i+1 < #xs : xs.i <= xs.(i+1)>
+    [ARITMETICA (-1 al rango)]
+x <= xs.0 ∧ <∀i : 0 <= i < #xs-1 : xs.i <= xs.(i+1)>
+    [HI]
+x <= xs.0 ∧ f.xs
+
+--PARA CERRAR
+f.[] = True
+f.(x:xs) = x <= xs.0 ∧ f.xs
 
 ------------------------------------------------------------------------------
---EJERCICIO 6
+--EJERCICIO 6: sea m una función que devuelva el minimo de una lista dada.
+m :: [Num] -> Num
+m.xs = <min i : 0 <= i < #xs : xs.i>
+
+--CB xs = []
+xs.[]
+    [ESPECIFICACIÓN]
+<min i : 0 <= i < #[] : [].i>
+    [DEF CARDINAL]
+<min i : 0 <= i < 0 : [].i>
+    [RANGO VACIO]
+0
+
+--CI xs = (x:xs)
+--HI = <min i : 0 <= i < #xs : xs.i>
+xs.(x:xs)
+    [ESPECIFICACIÓN]
+<min i : 0 <= i < #(x:xs) : (x:xs).i>
+    [DEF CARDINAL]
+<min i : 0 <= i < 1+#xs : (x:xs).i>
+    [LÓGICA]
+<min i : (0 <= i < 1) v (1 <= i < 1+#xs) : (x:xs).i>
+    [PARTICIÓN DE RANGO]
+<min i : 0 <= i < 1 : (x:xs).i> ∧ <min i : 1 <= i <= 1+#xs : (x:xs).i>
+    [RANGO UNITARIO]
+(x:xs).0 ∧ <min i : 1 <= i <= 1+#xs : (x:xs).i>
+    [DEF POSICIÓN]
+x ∧ <min i : 1 <= i <= 1+#xs : (x:xs).i>
+    [i <- i+1]
+x ∧ <min i : 1 <= i+1 <= 1+#xs : (x:xs).(i+1)>
+    [DEF POSICIÓN, ARITMETICA]
+x ∧ <min i : 0 <= i <= #xs : xs.i>
+    [HI]
+x ∧ f.xs
+
+--PARA CERRAR
+f.[] = 0
+f.(x:xs) = x ∧ f.xs
 
 ------------------------------------------------------------------------------
 --EJERCICIO 7
@@ -285,6 +362,7 @@ x = sum.(x:xs)-x v <∃j : (0 <= j < #xs) : xs.j = sum.(x:xs)-xs.j>
 
 ------------------------------------------------------------------------------
 --EJERCICIO 8
+
 
 ------------------------------------------------------------------------------
 --EJERCICIO 9
