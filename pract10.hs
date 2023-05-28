@@ -331,7 +331,7 @@ x = sum.(x:xs)-x v <∃j : (0 <= j < #xs) : xs.j = sum.(x:xs)-xs.j>
     False
     
     --CI xs = (x:xs)
-    --HI: <∃i : 0 <= i < #xs : xs.i = z+sum.xs-(xs.i)>
+    --HI g.z.xs = <∃i : 0 <= i < #xs : xs.i = z+sum.xs-(xs.i)>
     <∃i : 0 <= i < #(x:xs) : (x:xs).i = z+sum.(x:xs)-(x:xs).i>
         [DEF CARDINAL]
     <∃i : 0 <= i < 1+#xs : (x:xs).i = z+sum.(x:xs)-(x:xs).i>
@@ -361,14 +361,103 @@ x = sum.(x:xs)-x v <∃j : (0 <= j < #xs) : xs.j = sum.(x:xs)-xs.j>
     f.(x:xs) = (x = 0+sum.xs) v g.0.xs
 
 ------------------------------------------------------------------------------
---EJERCICIO 8
+--EJERCICIO 8: Dada f : Nat -> Bool y suponiendo que ∃n : 0 <= n : f.n
+-- especificar y derivar una función que encuentre el mínimo natural x tal que f.x
+-- ES DECIR: Encuentra el minimo n que cumpla con la condición f
+g :: (Nat -> Bool) -> Nat -> Nat
+g.f.x = <min x : 0 <= x ∧ f.x : x>
+--El primer valor de x que cumpla con la evaluación de f.x
 
+--CB x = 0
+x.0
+    [ESPECIFICACIÓN]
+<min x : 0 <= 0 ∧ f.0 : 0>
+    [RANGO VACIO]
+0
+
+--CB x = x+1
+--HI g.f.x = <min x : 0 <= x ∧ f.x : x>
+x.(x+1)
+    [ESPECIFICACIÓN]
+<min x : 0 <= x+1 ∧ f.(x+1) : x+1>
+
+    GENERALIZO
+    h.f.x = <min x : 0 <= x+1 ∧ f.(x+1) : x+1>
+    --CB x = 0
+    x.0
+        [ESPECIFICACIÓN]
+    <min x : 0 <= 0+1 ∧ f.(0+1) : 0+1>
+        [ARITMETICA]
+    <min x : 0 <= 1 ∧ f.1 : 1>
+        [RANGO UNITARIO]
+    1
+
+    --CI x = x+1
+    --CB h.f.x = <min x : 0 <= x+1 ∧ f.(x+1) : x+1>
+    x.(x+1)
+        [ESPECIFICACIÓN]
+    <min x : 0 <= (x+1)+1 ∧ f.((x+1)+1) : (x+1)+1>
+        [ARITMETICA]
+    <min x : 0 <= x+2 ∧ f.(x+2) : x+2>
+    
+    NO TENGO NI IDEA, CONSULTAR
 
 ------------------------------------------------------------------------------
---EJERCICIO 9
+--EJERCICIO 9: Dadas dos listas determinar si la primera es subseg. de la segunda
+p :: [a] -> [a] -> Bool
+p.xs.ys = <∃as,bs :: ys = as++xs++bs>
+
+--CB xs, ys = []
+xs.ys.[]
+    [ESPECIFICACIÓN]
+<∃as,bs :: [] = as++[]++bs>
+    [DEF CONCATENACIÓN]
+<∃as,bs :: [] = as++bs>
+    [LÓGICA]
+False
+
+--CI xs = x:xs, ys = y:ys
+--HI p.xs.ys = <∃as,bs :: ys = as++xs++bs>
+xs.(x:xs) ∧ y.(y:ys)
+    [ESPECIFICACIÓN]
+<∃as,bs :: y:ys = as++(x:xs)++bs>
+    [DEF CONCATENACIÓN]
+<∃as,bs :: [y]++ys = [x]++as++xs++bs>
+
+    MODULARIZAMOS
+    h.xs.ys.n.m = <∃as,bs :: [n]++ys = [m]++as++xs++bs>
+    --CB xs.ys = []
+    xs.ys.[]
+        [ESPECIFICACIÓN]
+    <∃as,bs :: [n]++[] = [m]++as++[]++bs>
+        [DEF CONCATENACIÓN]
+    <∃as,bs :: [n] = [m]++as++bs>
+        [LÓGICA]
+    False
+
+    --CI xs = x:xs, ys = y:ys
+    --HI h.xs.ys.n.m = <∃as,bs :: [n]++ys = [m]++as++xs++bs>
+    xs.(x:xs) ∧ y.(y:ys)
+        [ESPECIFICACIÓN]
+    <∃as,bs :: [n]++(y:ys) = [m]++as++(x:xs)++bs>
+        [DEF CONCATENACIÓN]
+    <∃as,bs :: [n]++[y]++ys = [m]++as++[x]++xs++bs>
+        [DEF CONCATENACIÓN]
+    <∃as,bs :: [n:y]++ys = [m:x]++as++xs++bs>
+        [HI]
+    h.xs.ys.n.m
+
+    EVALUAMOS P SEGUN LA MODULARIZACIÓN
+
+    p.[].[] = False
+    p.(x:xs).(y:ys) = h.xs.ys.[].[]
 
 ------------------------------------------------------------------------------
 --EJERCICIO 10
+f :: [Int] -> Int
+f.xs = <∑ n : 0 <= n < #xs : xs.n> / #xs
+
+    ESTA BIEN PERO NO CUMPLE CON LO PEDIDO EN EL EJERCICIO DE QUE SEAN CON TUPLAS
 
 ------------------------------------------------------------------------------
 --EJERCICIO 11
