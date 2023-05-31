@@ -2,7 +2,7 @@
 (xs ++ ys) ++ zs == xs ++ (ys ++ zs)
 
 --CB xs = []
-xs.[]
+xs = []
     [ESPECIFICACIÓN]
 ([] ++ ys) ++ zs == [] ++ (ys ++ zs)
     [DEF []]
@@ -12,7 +12,7 @@ True
 
 --CI xs = (x:xs)
 --HI = (xs ++ ys) ++ zs == xs ++ (ys ++ zs)
-xs.(x:xs)
+xs = (x:xs)
     [ESPEFICICACIÓN]
 (x:xs ++ ys) ++ zs == x:xs ++ (ys ++ zs)
     [DEF CONCATENACIÓN]
@@ -26,7 +26,7 @@ True
 --EJERCICIO 2: Demostrar las siguientes propiedades
 --map (f o g) xs = (map f) o (map g) xs
 --CB xs = []
-xs.[]
+xs = []
     [ESPECIFICACIÓN]
 map (f o g) [] = (map f) o (map g) []
     [DEF MAP [], DEF COMPOSICIÓN]
@@ -36,7 +36,7 @@ map (f o g) [] = (map f) o (map g) []
 
 --CI xs = (x:xs)
 --HI = map (f o g) xs = (map f) o (map g) xs
-xs.(x:xs)
+xs = (x:xs)
     [ESPECIFICACIÓN]
 map (f o g) (x:xs) = (map f) o (map g) (x:xs)
     [DEF COMPOSICIÓN]
@@ -52,7 +52,7 @@ True
 
 --reversa (xs++ys) = reversa ys ++ reversa xs
 --CB xs = []
-xs.[]
+xs = []
     [ESPECIFICACIÓN]
 reversa ([]++ys) = reversa ys ++ reversa []
     [DEF ++ []]
@@ -63,7 +63,7 @@ reversa ys = reversa ys
 
 --CI xs = (x:xs)
 --HI = reversa (xs++ys) = reversa ys ++ reversa xs
-xs.(x:xs)
+xs = (x:xs)
     [ESPECIFICACIÓN]
 reversa (x:xs++ys) = reversa ys ++ reversa (x:xs)
     [DEF CONCATENACIÓN]
@@ -77,7 +77,7 @@ True
 
 --reversa (reversa xs) = xs
 --CB xs = []
-xs.[]
+xs = []
     [ESPECIFICACIÓN]
 reversa (reversa []) = []
     [DEF REVERSA]
@@ -89,7 +89,7 @@ True
 
 --CI xs = (x:xs)
 --HI = reversa (reversa xs) = xs
-xs.(x:xs)
+xs = (x:xs)
     [ESPECIFICACIÓN]
 reversa (reversa (x:xs)) = x:xs
     [DEF REVERSA]
@@ -107,7 +107,7 @@ f :: [a] -> Bool
 f = <∀i : 0 <= i <= #xs : xs.0 == xs.i>
 
 --CB xs = []
-xs.[]
+f.[]
     [ESPECIFICACIÒN]
 <∀i : 0 <= i <= #[] : [].0 == [].i>
     [DEF CARDINAL]
@@ -117,7 +117,7 @@ True
 
 --CI xs = x:xs
 --HI: <∀i : 0 <= i <= #xs : xs.0 = xs.i>
-xs.(x:xs)
+f.(x:xs)
     [ESPECIFICACIÒN]
 <∀i : 0 <= i <= #(x:xs) : (x:xs).0 = (x:xs).i>
     [DEF CARDINAL, DEF POSICIÒN(Index o !!)]
@@ -163,23 +163,23 @@ x = x ∧ <∀i : 0 <= i < #xs : x = xs.i>
     [AHORA DEFINIMOS F CON G]
 
 f.[] = True
-f.(x:xs) = x ∧ g.z.xs
+f.(x:xs) = x ∧ g.x.xs
 
 ------------------------------------------------------------------------------
 --EJERCICIO 4
 f.xs = <∏i : o <= i < #xs : xs.i>
 --CB xs = []
-xs.[]
+f.[]
     [ESPECIFICACIÓN]
 <∏i : o <= i < #[] : [].i>
     [DEF CARDINAL]
 <∏i : o <= i < 0 : [].i>
     [RANGO VACIO]
-True
+1
 
 --CI xs = (x:xs)
 --HI = <∏i : o <= i < #xs : xs.i> = f.xs
-xs.(x:xs)
+f.(x:xs)
     [ESPECIFICACIÓN]
 <∏i : o <= i < #(x:xs) : (x:xs).i>
     [DEF CARDINAL]
@@ -187,28 +187,28 @@ xs.(x:xs)
     [LÓGICA]
 <∏i : (o <= i < 1) v (1 <= i < 1+#xs) : (x:xs).i>
     [PARTICIÓN DE RANGO]
-<∏i : (o <= i < 1) : (x:xs).i> ∧ <∏i : (1 <= i < 1+#xs) : (x:xs).i>
+<∏i : (o <= i < 1) : (x:xs).i> * <∏i : (1 <= i < 1+#xs) : (x:xs).i>
     [RANGO UNITARIO]
-(x:xs).0 ∧ <∏i : (1 <= i < 1+#xs) : (x:xs).i>
+(x:xs).0 * <∏i : (1 <= i < 1+#xs) : (x:xs).i>
     [i <- i+1]
-(x:xs).0 ∧ <∏i : (1 <= i+1 < 1+#xs) : (x:xs).i+1>
+(x:xs).0 * <∏i : (1 <= i+1 < 1+#xs) : (x:xs).i+1>
     [DEF POSICIÓN]
-x ∧ <∏i : (1 <= i+1 < 1+#xs) : xs.i>
+x * <∏i : (1 <= i+1 < 1+#xs) : xs.i>
     [ARITMETICA (-1 al rango)]
-x ∧ <∏i : (0 <= i < #xs) : xs.i>
+x * <∏i : (0 <= i < #xs) : xs.i>
     [HI]
-x ∧ f.xs
+x * f.xs
 
 --Para cerrar
-f.[] = True
-f.(x:xs) = x ∧ f.xs
+f.[] = 1
+f.(x:xs) = x * f.xs
 
 ------------------------------------------------------------------------------
 --EJERCICIO 5
 f.xs = <∀i : 0 <= i < #xs-1 : xs.i <= xs.(i+1)>
 
 --CB xs = []
-xs.[]
+f.[]
     [ESPECIFICACIÓN]
 <∀i : 0 <= i < #[]-1 : xs.i <= xs.(i+1)>
     [DEF CARDINAL]
@@ -218,7 +218,7 @@ True
 
 --CI xs = (x:xs)
 --HI = <∀i : 0 <= i < #xs-1 : xs.i <= xs.(i+1)> = f.xs
-xs.(x:xs)
+f.(x:xs)
     [ESPECIFICACIÓN]
 <∀i : 0 <= i < #(x:xs)-1 : (x:xs).i <= (x:xs).(i+1)>
     [DEF CARDINAL]
@@ -252,17 +252,17 @@ m :: [Num] -> Num
 m.xs = <min i : 0 <= i < #xs : xs.i>
 
 --CB xs = []
-xs.[]
+m.[]
     [ESPECIFICACIÓN]
 <min i : 0 <= i < #[] : [].i>
     [DEF CARDINAL]
 <min i : 0 <= i < 0 : [].i>
     [RANGO VACIO]
-0
+-inf
 
 --CI xs = (x:xs)
 --HI = <min i : 0 <= i < #xs : xs.i>
-xs.(x:xs)
+m.(x:xs)
     [ESPECIFICACIÓN]
 <min i : 0 <= i < #(x:xs) : (x:xs).i>
     [DEF CARDINAL]
@@ -270,137 +270,129 @@ xs.(x:xs)
     [LÓGICA]
 <min i : (0 <= i < 1) v (1 <= i < 1+#xs) : (x:xs).i>
     [PARTICIÓN DE RANGO]
-<min i : 0 <= i < 1 : (x:xs).i> ∧ <min i : 1 <= i <= 1+#xs : (x:xs).i>
-    [RANGO UNITARIO]
-(x:xs).0 ∧ <min i : 1 <= i <= 1+#xs : (x:xs).i>
-    [DEF POSICIÓN]
-x ∧ <min i : 1 <= i <= 1+#xs : (x:xs).i>
-    [i <- i+1]
-x ∧ <min i : 1 <= i+1 <= 1+#xs : (x:xs).(i+1)>
+<min i : 0 <= i < 1 : (x:xs).i> 'min' <min i : 1 <= i <=(x:xs).0
+x 'min' <min i : 1 <= i+1 <= 1+#xs : (x:xs).(i+1)>
     [DEF POSICIÓN, ARITMETICA]
-x ∧ <min i : 0 <= i <= #xs : xs.i>
+x 'min' <min i : 0 <= i <= #xs : xs.i>
     [HI]
-x ∧ f.xs
+x 'min' f.xs
 
 --PARA CERRAR
-f.[] = 0
-f.(x:xs) = x ∧ f.xs
+m.[] = -inf
+m.(x:xs) = x 'min' f.xs
 
 ------------------------------------------------------------------------------
---EJERCICIO 7
-f :: [Num] -> Bool
-<∃i : 0 <= i < #xs : xs.i = sum xs-(xs.i)>
+--EJERCICIO 7: Especificar y derivar que dada una lista determine si existe un
+-- elemento de ella que sea igual a la suma del resto de los elementos de la lista
+g :: [a] -> Bool
+g.xs = <∃n : 0 <= n < #xs : sum xs-(xs.n) = xs.n>
 
 --CB xs = []
-<∃i : 0 <= i < #[] : [].i = sum []-([].i)>
+g.[]
+    [ESPECIFICACIÓN]
+<∃n : 0 <= n < #[] : sum []-([].n) = [].n>
     [DEF CARDINAL]
-<∃i : 0 <= i < 0 : [].i = sum []-([].i)>
+<∃n : 0 <= n < 0 : sum []-([].n) = [].n>
     [RANGO VACIO]
 False
 
 --CI xs = (x:xs)
---HI: <∃i : 0 <= i < #xs : xs.i = sum.xs-(xs.i)>
-<∃i : 0 <= i < #(x:xs) : (x:xs).i = sum.(x:xs)-(x:xs).i>
+--HI g.xs = <∃n : 0 <= n < #xs : sum xs-(xs.n) = xs.n>
+g.(x:xs)
+    [ESPECIFICACIÓN]
+<∃i : 0 <= i < #(x:xs) : sum (x:xs)-(x:xs).i = (x:xs).i>
     [DEF CARDINAL]
-<∃i : 0 <= i < 1+#xs : (x:xs).i = sum.(x:xs)-(x:xs).i>
-    [LÒGICA]
-<∃i : (0 <= i < 1) v (1 <= i < 1+#xs) : (x:xs).i = sum.(x:xs)-(x:xs).i>
-    [PARTICIÒN DE RANGO]
-<∃i : (0 <= i < 1) : (x:xs).i = sum.(x:xs)-(x:xs).i> v <∃i : (1 <= i < 1+#xs) : (x:xs).i = sum.(x:xs)-(x:xs).i>
+<∃i : 0 <= i < 1+#xs : sum (x:xs)-(x:xs).i = (x:xs).i>
+    [LÓGICA]
+<∃i : (0 <= i < 1) v (1 <= i < 1+#xs) : sum (x:xs)-(x:xs).i = (x:xs).i>
+    [PARTICIÓN DE RANGO]
+<∃i : 0 <= i < 1 : sum (x:xs)-(x:xs).i = (x:xs).i> v <∃i : 1 <= i < 1+#xs : sum (x:xs)-(x:xs).i = (x:xs).i>
     [RANGO UNITARIO]
-((x:xs).0 = sum.(x:xs)-(x:xs).0) v <∃i : (1 <= i < 1+#xs) : (x:xs).i = sum.(x:xs)-(x:xs).i>
-    [DEF POSICIÒN]
-x = sum.(x:xs)-x v <∃i : (1 <= i < 1+#xs) : (x:xs).i = sum.(x:xs)-(x:xs).i>
-    [i <- j+1]
-x = sum.(x:xs)-x v <∃j : (1 <= j+1 < 1+#xs) : (x:xs).j+1 = sum.(x:xs)-(x:xs).j+1>
+sum (x:xs)-(x:xs).0 = (x:xs).0 v <∃i : 1 <= i < 1+#xs : sum (x:xs)-(x:xs).i = (x:xs).i>
+    [DEF CARDINAL]
+sum (x:xs)-x = x v <∃i : 1 <= i < 1+#xs : sum (x:xs)-(x:xs).i = (x:xs).i>
+    [DEF SUM, ARITMETICA]
+sum xs = x v <∃i : 1 <= i < 1+#xs : x+sum xs-(x:xs).i = (x:xs).i>
+    [i <- i+1]
+sum xs = x v <∃i : 1 <= i+1 < 1+#xs : x+sum xs-(x:xs).(i+1) = (x:xs).(i+1)>
     [ARITMETICA]
-x = sum.(x:xs)-x v <∃j : (0 <= j < #xs) : (x:xs).j+1 = sum.(x:xs)-(x:xs).j+1>
-    [DEF POSICIÒN]
-x = sum.(x:xs)-x v <∃j : (0 <= j < #xs) : xs.j = sum.(x:xs)-xs.j>
+sum xs = x v <∃i : 0 <= i < #xs : x+sum xs-xs.i = xs.i>
 
-         --LLEGAMOS A UN OBSTACULO IMPASABLE, PASAMOS A GENERALIZAR
-        
-    g :: Num -> [Num] -> Bool
-    <∃i : 0 <= i < #xs : xs.i = z+sum xs-(xs.i)>
-
+    GENERALIZACIÓN
+    g.z.xs = <∃i : 0 <= i < #xs : z+sum xs-xs.i = xs.i>
+    
     --CB xs = []
-    <∃i : 0 <= i < #[] : [].i = z+sum []-([].i)>
+    g.z.[]
+        [ESPECIFICACIÓN]
+    <∃i : 0 <= i < #[] : z+sum []-[].i = [].i>
         [DEF CARDINAL]
-    <∃i : 0 <= i < 0 : [].i = z+sum []-([].i)>
+    <∃i : 0 <= i < 0 : z+sum []-[].i = [].i>
         [RANGO VACIO]
     False
-    
-    --CI xs = (x:xs)
-    --HI g.z.xs = <∃i : 0 <= i < #xs : xs.i = z+sum.xs-(xs.i)>
-    <∃i : 0 <= i < #(x:xs) : (x:xs).i = z+sum.(x:xs)-(x:xs).i>
-        [DEF CARDINAL]
-    <∃i : 0 <= i < 1+#xs : (x:xs).i = z+sum.(x:xs)-(x:xs).i>
-        [LÒGICA]
-    <∃i : (0 <= i < 1) v (1 <= i < 1+#xs) : (x:xs).i = z+sum.(x:xs)-(x:xs).i>
-        [PARTICIÒN DE RANGO]
-    <∃i : (0 <= i < 1) : (x:xs).i = z+sum.(x:xs)-(x:xs).i> v <∃i : (1 <= i < 1+#xs) : (x:xs).i = z+sum.(x:xs)-(x:xs).i>
-        [RANGO UNITARIO]
-    ((x:xs).0 = z+sum.(x:xs)-(x:xs).0) v <∃i : (1 <= i < 1+#xs) : z+(x:xs).i = sum.(x:xs)-(x:xs).i>
-        [DEF POSICIÒN]
-    x = z+sum.xs-x+x v <∃i : (1 <= i < 1+#xs) : (x:xs).i = z+sum.(x:xs)-(x:xs).i>
-        [ARIMETICA, i <- j+1]
-    x = z+sum.xs v <∃j : (1 <= j+1 < 1+#xs) : (x:xs).j+1 = z+sum.(x:xs)-(x:xs).j+1>
-        [ARITMETICA]
-    x = z+sum.xs v <∃j : (0 <= j < #xs) : (x:xs).j+1 = z+sum.(x:xs)-(x:xs).j+1>
-        [DEF POSICIÒN]
-    x = z+sum.xs v <∃j : (0 <= j < #xs) : xs.j = z+x+sum.xs-(xs.j)>
-        [ARITMETICA]
-    x = z+sum.xs v <∃j : (0 <= j < #xs) : xs.j = (z+x)+sum.xs-(xs.j)>
-        [HI]
-    x = z+sum.xs v g.z.xs
-    
 
-            [AHORA DEFINIMOS F CON G]
-    
-    f.[] = False
-    f.(x:xs) = (x = 0+sum.xs) v g.0.xs
+    --CI xs = (x:xs)
+    --HI g.z.xs = <∃i : 0 <= i < #xs : z+sum xs-xs.i = xs.i>
+    g.z.(x:xs)
+        [ESPECIFICACIÓN]
+    <∃i : 0 <= i < #(x:xs) : z+sum (x:xs)-(x:xs).i = (x:xs).i>
+        [DEF CARDINAL]
+    <∃i : 0 <= i < 1+#xs : z+sum (x:xs)-(x:xs).i = (x:xs).i>
+        [LÓGICA]
+    <∃i : (0 <= i < 1) v (1 <= i < 1+#xs) : z+sum (x:xs)-(x:xs).i = (x:xs).i>
+        [PARTICIÓN DE RANGO]
+    <∃i : 0 <= i < 1 : z+sum (x:xs)-(x:xs).i = (x:xs).i> v <∃i : 1 <= i < 1+#xs : z+sum (x:xs)-(x:xs).i = (x:xs).i>
+        [RANGO UNITARIO]
+    z+sum (x:xs)-(x:xs).0 = (x:xs).0 v <∃i : 1 <= i < 1+#xs : z+sum (x:xs)-(x:xs).i = (x:xs).i>
+        [DEF SUM, DEF CARDINAL]
+    z+x+sum xs-x = x v <∃i : 1 <= i < 1+#xs : z+sum (x:xs)-(x:xs).i = (x:xs).i>
+        [ARITMETICA]
+    z+sum xs = x v <∃i : 1 <= i < 1+#xs : z+sum (x:xs)-(x:xs).i = (x:xs).i>
+        [i <- i+1]
+    z+sum xs = x v <∃i : 1 <= i+1 < 1+#xs : z+sum (x:xs)-(x:xs).(i+1) = (x:xs).(i+1)>
+        [ARITMETICA]
+    z+sum xs = x v <∃i : 0 <= i < #xs : z+sum (x:xs)-(x:xs).(i+1) = (x:xs).(i+1)>
+        [DEF POSICIÓN, DEF SUM]
+    z+sum xs = x v <∃i : 0 <= i < #xs : z+x+sum xs - xs.i = xs.i>
+        [ARITMETICA]
+    z+sum xs = x v <∃i : 0 <= i < #xs : (z+x) + sum xs - xs.i = xs.i>
+        [HI]
+    z+sum xs = x v g.z.xs
+
+    g.[] = False
+    g.(x:xs) = (z+sum xs = x) v g.z.xs
+
+    [VOLVEMOS AL PROBLEMA ORIGINAL]
+
+f.[] = False
+f.(x:xs) = (0+sum xs = x) v g.0.xs
 
 ------------------------------------------------------------------------------
 --EJERCICIO 8: Dada f : Nat -> Bool y suponiendo que ∃n : 0 <= n : f.n
 -- especificar y derivar una función que encuentre el mínimo natural x tal que f.x
 -- ES DECIR: Encuentra el minimo n que cumpla con la condición f
 g :: (Nat -> Bool) -> Nat -> Nat
-g.f.x = <min x : 0 <= x ∧ f.x : x>
---El primer valor de x que cumpla con la evaluación de f.x
+g.f.n = <min x : 0 <= x < n ∧ f.x: x>
 
 --CB x = 0
-x.0
+g.f.0
     [ESPECIFICACIÓN]
-<min x : 0 <= 0 ∧ f.0 : 0>
+<min i : 0 <= i < 0 ∧ f.i: i>
     [RANGO VACIO]
 0
 
---CB x = x+1
---HI g.f.x = <min x : 0 <= x ∧ f.x : x>
-x.(x+1)
+--CI x = x+1
+--HI g.f.x = <min i : 0 <= i < x ∧ f.i: i>
+g.f.(x+1)
     [ESPECIFICACIÓN]
-<min x : 0 <= x+1 ∧ f.(x+1) : x+1>
-
-    GENERALIZO
-    h.f.x = <min x : 0 <= x+1 ∧ f.(x+1) : x+1>
-    --CB x = 0
-    x.0
-        [ESPECIFICACIÓN]
-    <min x : 0 <= 0+1 ∧ f.(0+1) : 0+1>
-        [ARITMETICA]
-    <min x : 0 <= 1 ∧ f.1 : 1>
-        [RANGO UNITARIO]
-    1
-
-    --CI x = x+1
-    --CB h.f.x = <min x : 0 <= x+1 ∧ f.(x+1) : x+1>
-    x.(x+1)
-        [ESPECIFICACIÓN]
-    <min x : 0 <= (x+1)+1 ∧ f.((x+1)+1) : (x+1)+1>
-        [ARITMETICA]
-    <min x : 0 <= x+2 ∧ f.(x+2) : x+2>
-    
-    NO TENGO NI IDEA, CONSULTAR
+<min i : 0 <= i < x+1 ∧ f.i: i>
+    [LÓGICA, PARTICIÓN DE RANGO]
+<min i : 0 <= i < 1 ∧ f.i: i> 'min' <min i : 1 <= i < x+1 ∧ f.i: i>
+    [RANGO UNITARIO]
+0 'min' <min i : 1 <= i < x+1 ∧ f.i: i>
+    [i <- i+1]
+0 'min' <min i : 1 <= i+1 < x+1 ∧ f.(i+1): i+1>
+    [ARITMETICA]
+0 'min' <min i : 0 <= i < x ∧ f.(i+1): i+1>
 
 ------------------------------------------------------------------------------
 --EJERCICIO 9: Dadas dos listas determinar si la primera es subseg. de la segunda
@@ -408,7 +400,7 @@ p :: [a] -> [a] -> Bool
 p.xs.ys = <∃as,bs :: ys = as++xs++bs>
 
 --CB xs, ys = []
-xs.ys.[]
+p.[].[]
     [ESPECIFICACIÓN]
 <∃as,bs :: [] = as++[]++bs>
     [DEF CONCATENACIÓN]
@@ -418,16 +410,16 @@ False
 
 --CI xs = x:xs, ys = y:ys
 --HI p.xs.ys = <∃as,bs :: ys = as++xs++bs>
-xs.(x:xs) ∧ y.(y:ys)
+p.(x:xs).(y:ys)
     [ESPECIFICACIÓN]
 <∃as,bs :: y:ys = as++(x:xs)++bs>
     [DEF CONCATENACIÓN]
 <∃as,bs :: [y]++ys = [x]++as++xs++bs>
 
-    MODULARIZAMOS
+    GENERALIZAS
     h.xs.ys.n.m = <∃as,bs :: [n]++ys = [m]++as++xs++bs>
     --CB xs.ys = []
-    xs.ys.[]
+    h.[].[].n.m
         [ESPECIFICACIÓN]
     <∃as,bs :: [n]++[] = [m]++as++[]++bs>
         [DEF CONCATENACIÓN]
@@ -437,7 +429,7 @@ xs.(x:xs) ∧ y.(y:ys)
 
     --CI xs = x:xs, ys = y:ys
     --HI h.xs.ys.n.m = <∃as,bs :: [n]++ys = [m]++as++xs++bs>
-    xs.(x:xs) ∧ y.(y:ys)
+    h.(x:xs).(y:ys).n.m
         [ESPECIFICACIÓN]
     <∃as,bs :: [n]++(y:ys) = [m]++as++(x:xs)++bs>
         [DEF CONCATENACIÓN]
@@ -447,7 +439,7 @@ xs.(x:xs) ∧ y.(y:ys)
         [HI]
     h.xs.ys.n.m
 
-    EVALUAMOS P SEGUN LA MODULARIZACIÓN
+    EVALUAMOS P SEGUN LA GENERALIZACIÓN
 
     p.[].[] = False
     p.(x:xs).(y:ys) = h.xs.ys.[].[]
@@ -458,6 +450,3 @@ f :: [Int] -> Int
 f.xs = <∑ n : 0 <= n < #xs : xs.n> / #xs
 
     ESTA BIEN PERO NO CUMPLE CON LO PEDIDO EN EL EJERCICIO DE QUE SEAN CON TUPLAS
-
-------------------------------------------------------------------------------
---EJERCICIO 11
