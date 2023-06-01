@@ -33,6 +33,8 @@ map (f o g) [] = (map f) o (map g) []
 [] = map f []
     [DEF MAP []]
 [] = []
+    [LÓGICA]
+True
 
 --CI xs = (x:xs)
 --HI = map (f o g) xs = (map f) o (map g) xs
@@ -60,6 +62,7 @@ reversa ys = reversa ys ++ reversa []
     [DEF REVERSA []]
 reversa ys = reversa ys
     [LÓGICA]
+True
 
 --CI xs = (x:xs)
 --HI = reversa (xs++ys) = reversa ys ++ reversa xs
@@ -371,40 +374,55 @@ f.(x:xs) = (0+sum xs = x) v g.0.xs
 -- especificar y derivar una función que encuentre el mínimo natural x tal que f.x
 -- ES DECIR: Encuentra el minimo n que cumpla con la condición f
 g :: (Nat -> Bool) -> Nat -> Nat
-g.f.n = <min x : 0 <= x < n ∧ f.x: x>
+g.n = <min i : n <= i ∧ f.i: i>
 
---CB x = 0
-g.f.0
+--SE RESUELVE USANDO CAMBIO DE VARIABLES, PAG. 193
+g.n
     [ESPECIFICACIÓN]
-<min i : 0 <= i < 0 ∧ f.i: i>
-    [RANGO VACIO]
-0
+<min i : n <= i ∧ f.i : i>
+    [PARTICIÓN DE RANGO]
+<min i : n = i ∧ f.i : i> 'min' <min i : n+1 <= i ∧ f.i : i>
+    [LEIBNITZ]
+<min i : n = i ∧ f.i : i> 'min' <min i : n+1 <= i ∧ f.i : i>
+    [HI]
+<min i : n = i ∧ f.i : i> 'min' g.(n+1)
+--AHORA SE HACE NECESARIO UN ANALISIS POR CASOS DE ACUERDO AL VALOR DE F.N.
+--EL CASO EN QUE EL PREDICADO ES CIERTO SE TRANSFORMARA EN EL CASO BASE DE F.
 
---CI x = x+1
---HI g.f.x = <min i : 0 <= i < x ∧ f.i: i>
-g.f.(x+1)
-    [ESPECIFICACIÓN]
-<min i : 0 <= i < x+1 ∧ f.i: i>
-    [LÓGICA, PARTICIÓN DE RANGO]
-<min i : 0 <= i < 1 ∧ f.i: i> 'min' <min i : 1 <= i < x+1 ∧ f.i: i>
+--CB f.n
+<min i : n = i ∧ f.i : i> 'min' g.(n+1)
     [RANGO UNITARIO]
-0 'min' <min i : 1 <= i < x+1 ∧ f.i: i>
-    [i <- i+1]
-0 'min' <min i : 1 <= i+1 < x+1 ∧ f.(i+1): i+1>
-    [ARITMETICA]
-0 'min' <min i : 0 <= i < x ∧ f.(i+1): i+1>
+n 'min' g.(n+1)
+    [n <= g.(n+1)]
+n
+
+--CI -f.n
+<min i : n = i ∧ False : i> 'min' g.(n+1)
+    [RANGO VACIO]
++inf min g.(n+1)
+    [NEUTRO DEL MIN]
+g.(n+1)
 
 ------------------------------------------------------------------------------
 --EJERCICIO 9: Dadas dos listas determinar si la primera es subseg. de la segunda
 p :: [a] -> [a] -> Bool
 p.xs.ys = <∃as,bs :: ys = as++xs++bs>
 
---CB xs, ys = []
-p.[].[]
+--CB xs = []
+p.xs.[]
     [ESPECIFICACIÓN]
-<∃as,bs :: [] = as++[]++bs>
+<∃as,bs :: [] = as++xs++bs>
     [DEF CONCATENACIÓN]
-<∃as,bs :: [] = as++bs>
+<∃as,bs :: [] = as++xs++bs>
+    [LÓGICA]
+False
+
+--CB ys = []
+p.[].ys
+    [ESPECIFICACIÓN]
+<∃as,bs :: ys = as++[]++bs>
+    [DEF CONCATENACIÓN]
+<∃as,bs :: ys = as++[]++bs>
     [LÓGICA]
 False
 
@@ -416,37 +434,44 @@ p.(x:xs).(y:ys)
     [DEF CONCATENACIÓN]
 <∃as,bs :: [y]++ys = [x]++as++xs++bs>
 
-    GENERALIZAS
-    h.xs.ys.n.m = <∃as,bs :: [n]++ys = [m]++as++xs++bs>
-    --CB xs.ys = []
-    h.[].[].n.m
-        [ESPECIFICACIÓN]
-    <∃as,bs :: [n]++[] = [m]++as++[]++bs>
-        [DEF CONCATENACIÓN]
-    <∃as,bs :: [n] = [m]++as++bs>
-        [LÓGICA]
-    False
-
-    --CI xs = x:xs, ys = y:ys
-    --HI h.xs.ys.n.m = <∃as,bs :: [n]++ys = [m]++as++xs++bs>
-    h.(x:xs).(y:ys).n.m
-        [ESPECIFICACIÓN]
-    <∃as,bs :: [n]++(y:ys) = [m]++as++(x:xs)++bs>
-        [DEF CONCATENACIÓN]
-    <∃as,bs :: [n]++[y]++ys = [m]++as++[x]++xs++bs>
-        [DEF CONCATENACIÓN]
-    <∃as,bs :: [n:y]++ys = [m:x]++as++xs++bs>
-        [HI]
-    h.xs.ys.n.m
-
-    EVALUAMOS P SEGUN LA GENERALIZACIÓN
-
-    p.[].[] = False
-    p.(x:xs).(y:ys) = h.xs.ys.[].[]
+    MODULARIZACIÓN
 
 ------------------------------------------------------------------------------
 --EJERCICIO 10
-f :: [Int] -> Int
-f.xs = <∑ n : 0 <= n < #xs : xs.n> / #xs
+sum xs = <∑n : 0 <= n < #xs : xs.n>
+cont xs = <Ni : 0 <= i < #xs : 1>
 
-    ESTA BIEN PERO NO CUMPLE CON LO PEDIDO EN EL EJERCICIO DE QUE SEAN CON TUPLAS
+prom xs = <(sum xs, cont xs)>
+
+prom :: [Int] -> (Int, Int)
+prom [x] = (x, 1)
+prom (x:xs) = (x+a, 1+b)
+    where (a, b) = prom xs
+
+--CB xs = [x]
+prom.[x]
+    [ESPECIFICACIÓN]
+<(sum [x], cont [x])>
+    [DEF SUM, DEF CONT]
+(x, 1)
+
+--CB xs = []
+prom.[]
+    [ESPECIFICACIÓN]
+<(sum [], cont [])>
+    [DEF SUM, DEF CONT]
+(0, 0)
+
+--CI xs = (x:xs)
+--HI prom.(x:xs) = prom.xs
+prom.(x:xs)
+    [ESPECIFICACIÓN]
+<(sum (x:xs), cont (x:xs))>
+    [DEF SUM, DEF CONT]
+<(x+sum xs, 1+cont xs)>
+    [VARIABLES LOCALES INTRODUCCIÓN]
+<(x+a, 1+b)>
+    [(a,b) = (sum xs, cont xs)]
+(x+a, 1+b)
+    [HI]
+(a,b) = prom xs
