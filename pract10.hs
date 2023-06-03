@@ -359,15 +359,15 @@ sum xs = x v <∃i : 0 <= i < #xs : x+sum xs-xs.i = xs.i>
         [ARITMETICA]
     z+sum xs = x v <∃i : 0 <= i < #xs : (z+x) + sum xs - xs.i = xs.i>
         [HI]
-    z+sum xs = x v g.z.xs
+    z+sum xs = x v g.(z+x).xs
 
     g.[] = False
-    g.(x:xs) = (z+sum xs = x) v g.z.xs
+    g.(x:xs) = (z+sum xs = x) v g.(z+x).xs
 
     [VOLVEMOS AL PROBLEMA ORIGINAL]
 
 f.[] = False
-f.(x:xs) = (0+sum xs = x) v g.0.xs
+f.(x:xs) = (0+sum xs = x) v g.(0+x).xs
 
 ------------------------------------------------------------------------------
 --EJERCICIO 8: Dada f : Nat -> Bool y suponiendo que ∃n : 0 <= n : f.n
