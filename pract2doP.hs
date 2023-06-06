@@ -946,3 +946,162 @@ x <= y -> y >= x
 x <= y -> x <= y
     [LÓGICA]
 True
+
+-- {True}
+-- x, y := y*y, x*x;
+-- if x >= y -> x := x+1
+-- [] x <= y -> y := y-x
+-- fi
+-- {x >= 0 ∧ y >= 0}
+
+--Dado S1: x,y := y*y, x*x
+--     S2: if
+--Hay que demostrar: P -> wp.S1.(wp.S2.Q)
+
+--Para wp.if.Q hay que demostrar:
+-- I. [B0 v B1 v...v Bn]
+-- II. ∧ Bn -> wp.Sn.Q
+
+-- I. [x >= y v x <= y]
+x >= y v x <= y
+    [LÓGICA, ya que x >= y/x <= y cubre todo el dominio en, post, pre a la y]
+True
+
+-- II. x >= y -> wp.(x := x+1).(x >= 0 ∧ y >= 0)
+x >= y -> wp.(x := x+1).(x >= 0 ∧ y >= 0)
+    [DEF ASIGNACIÓN WP]
+x >= y -> x+1 >= 0 ∧ y >= 0
+    [LÓGICA, ya que x+1 >= 0 e y >= 0]
+x >= y -> x+1 >= y
+    [LEIBNITZ, si x >= y entonces x+1 >= y]
+True
+
+-- II. x <= y -> wp.(y := y-x).(x >= 0 ∧ y >= 0)
+x <= y -> wp.(y := y-x).(x >= 0 ∧ y >= 0)
+    [DEF ASIGNACIÓN WP]
+x <= y -> x >= 0 ∧ y-x >= 0
+    [ARITMETICA]
+x <= y -> x >= 0 ∧ -x >= -y
+    [ARITMETICA]
+x <= y -> x >= 0 ∧ x <= y
+    [LEIBNITZ]
+True
+
+--Demostramos el wp.S2.Q, ahora demostramos lo que nos falta
+P -> wp.S1.True
+    [DEF S1, DEF P]
+True -> wp.(x, y := y*y, x*x).True
+    [DEF ASIGNACIÓN WP]
+True -> True
+    [LÓGICA]
+True
+
+-- {True}
+-- if not a or b -> a := not a
+-- [] a or not b -> b := not b
+-- fi
+-- {a v b}
+
+-- I. [P -> (B0 v B1 v..v Bn)]
+-- II. ∧ {P ∧ Bn} Sn {Q}
+
+-- I. [True -> (not a or b) v (a or not b)]
+True -> (not a or b) v (a or not b)
+    [CONMUTATIVA v]
+True -> (not a or a) v (b or not b)
+    [TERCERO EXCLUIDO]
+True -> True v True
+    [LÓGICA]
+True
+
+-- II. {True ∧ not a or b} a := not a {a v b}
+{True ∧ not a or b} a := not a {a v b}
+    [DEF WP]
+True ∧ not a or b -> wp.(a := not a).(a v b)
+    [NEUTRO ∧, DEF ASIGNACIÓN WP]
+not a or b -> not a v b
+    [LÓGICA]
+True
+
+-- II. {True ∧ a or not b} b := not b {a v b}
+{True ∧ a or not b} b := not b {a v b}
+    [DEF WP]
+True ∧ a or not b -> wp.(b := not b).(a v b)
+    [NEUTRO ∧, DEF ASIGNACIÓN WP]
+a or not b -> a v not b
+    [LÓGICA]
+True
+
+-- {N >= 0}
+-- x := 0
+-- do x <> N -> x := x+1
+-- od
+-- {x = N}
+
+-- TEOREMA DEL DO, 5 PUNTOS
+-- Inicialización: {P} S {I}
+-- Postcondición: [I ∧ -B0 ∧..∧ -Bn -> Q]
+-- Invariante: {Bn ∧ I} Sn {I}
+-- Variante(a): I ∧ Bn -> v => 0
+-- Variante(b): {I ∧ Bn ∧ v = A} Sn {v < A}
+
+-- NECESITAMOS AVERIGUAR I
+-- Vamos a hacerlo comprobando el ciclo y ver que no varia
+x = 0 ----> x = N (Q)
+N = 3 ----> x <> 3 = x+1
+    0 <> 3 -> True, 0 < 3, 3-0 = 3
+    1 <> 3 -> True, 1 < 3, 3-1 = 2
+    2 <> 3 -> True, 2 < 3, 3-2 = 1
+    3 <> 3 -> False, 3 = 3, 3-3 = 0
+
+-- ANALIZANDO LA RECURSIÓN TENEMOS QUE
+I = x <= N
+v = N-x
+
+--Inicialización
+--{P}S{I}
+{N >= 0} x := 0 {x <= N}
+    [DEF WP]
+N >= 0 -> wp.(x := 0).(x <= N)
+    [DEF ASIGNACIÓN WP]
+N >= 0 -> 0 <= N
+    [ARITMETICA]
+N >= 0 -> N >= 0
+    [LEIBNITZ]
+True
+
+--Postcondición
+--(I ∧ -Bn) -> Q
+(x <= N ∧ x = N) -> x = N
+    [LEIBNITZ]
+True
+
+--Invariante
+--{I ∧ Bn}Sn{I}
+{x <= N ∧ x <> N} x := x+1 {x <= N}
+    [DEF WP]
+x <= N ∧ x <> N -> wp.(x := x+1).(x <= N)
+    [DEF ASIGNACIÓN WP]
+x <= N ∧ x <> N -> x+1 <= N
+    [LEIBNITZ Y LÓGICA (Si x <= N entonces tambien se cumple que x+1 <= N)]
+True
+
+--Variante(a)
+--I ∧ Bn -> v >= 0
+x <= N ∧ x <> N -> N-x >= 0
+    [ARITMETICA]
+x <= N ∧ x <> N -> N >= x
+    [LEIBNITZ]
+True
+
+--Variante(b)
+--{I ∧ Bn ∧ v = A} Sn {v < A}
+{x <= N ∧ x <> N ∧ N-x = A} x := x+1 {N-x < A}
+    [DEF WP]
+x <= N ∧ x <> N ∧ N-x = A -> wp.(x := x+1).(N-x < A)
+    [DEF ASIGNACIÓN WP]
+x <= N ∧ x <> N ∧ N-x = A -> N-(x+1) < A
+    [ARITMETICA, LEIBNITZ]
+x <= N ∧ x <> N ∧ N-x = A -> N-x-1 < N-x
+    [LÓGICA]
+True
