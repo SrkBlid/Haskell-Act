@@ -759,7 +759,7 @@ f.xs.[] = False
 f.(x:xs).(y:ys) = |x - y| 'Min' f.xs.ys
 
 ------------------------------------------------------------------------------
---PRÁCTICO 10
+--PRÁCTICO 11
 ------------------------------------------------------------------------------
 --EJERCICIO 1: Encontrar la wp
 -- {wp} x := (x-y)*(x+y) {x+y^2 = 0}
@@ -1105,3 +1105,660 @@ x <= N ∧ x <> N ∧ N-x = A -> N-(x+1) < A
 x <= N ∧ x <> N ∧ N-x = A -> N-x-1 < N-x
     [LÓGICA]
 True
+
+------------------------------------------------------------------------------
+--Ejercicio 5
+con N : Nat
+var n : Nat; r : Bool
+var A : array [0..N) of Nat
+
+{N > 0}
+n, r := 0, True
+
+I = {r= <∀i : 0 <= i < n : A.i = A.(N-i-1)> ∧ 0 <= n <= N}
+
+do n <> N
+	n, r := n+1, r and A.n = A.(N-n-1)
+od
+
+{r= <∀i : 0 <= i < N : A.i = A.(N-i-1)>}
+
+--Inicializaciòn
+--{P}S{I}
+{N > 0} n, r := 0, True {r= <∀i : 0 <= i < n : A.i = A.(N-i-1)> ∧ 0 <= n <= N}
+	[DEF WP]
+N > 0 -> wp.(n, r := 0, True).(r= <∀i : 0 <= i < n : A.i = A.(N-i-1)> ∧ 0 <= n <= N)
+	[DEF ASIGNACIÒN WP]
+N > 0 -> True = <∀i : 0 <= i < 0 : A.i = A.(N-i-1)> ∧ 0 <= 0 <= N
+	[RANGO VACIO]
+N > 0 -> True = 0 <= N
+	[LÒGICA, ARITMETICA]
+N > 0 -> N >=0
+	[LÒGICA]
+True
+
+--Postcondiciòn
+--(I ∧ -Bn) -> Q
+(r= <∀i : 0 <= i < n : A.i = A.(N-i-1)> ∧ 0 <= n <= N) ∧ n = N -> r= <∀i : 0 <= i < N : A.i = A.(N-i-1)>
+	[LEIBNITZ]
+(r= <∀i : 0 <= i < n : A.i = A.(N-i-1)> ∧ 0 <= n <= N) ∧ n = N -> r= <∀i : 0 <= i < n : A.i = A.(N-i-1)>
+	[LEIBNITZ]
+(r= <∀i : 0 <= i < n : A.i = A.(N-i-1)> ∧ 0 <= n <= N) ∧ n = N -> r= r>
+	[LÒGICA]
+True
+
+--Invariante
+--{I ∧ Bn} Sn {I}
+{(r= <∀i : 0 <= i < n : A.i = A.(N-i-1)> ∧ 0 <= n <= N) ∧ n <> N} n, r := n+1, r and A.n = A.(N-n-1) {r= <∀i : 0 <= i < n : A.i = A.(N-i-1)> ∧ 0 <= n <= N>}
+	[DEF WP]
+(r= <∀i : 0 <= i < n : A.i = A.(N-i-1)> ∧ 0 <= n <= N) ∧ n <> N -> wp.(n, r := n+1, r and A.n = A.(N-n-1)).(r = <∀i : 0 <= i < n : A.i = A.(N-i-1)> ∧ 0 <= n <= N>)
+	[DEF ASIGNACIÒN WP]
+(r= <∀i : 0 <= i < n : A.i = A.(N-i-1)> ∧ 0 <= n <= N) ∧ n <> N -> r and A.n = A.(N-n-1) = <∀i : 0 <= i < n+1 : A.i = A.(N-i-1)> ∧ 0 <= n+1 <= N>
+	[PARTICIÒN DE RANGO]
+(r= <∀i : 0 <= i < n : A.i = A.(N-i-1)> ∧ 0 <= n <= N) ∧ n <> N -> r and A.n = A.(N-n-1) = <∀i : 0 <= i < n : A.i = A.(N-i-1)> ∧ <∀i : n <= i < n+1 : A.i = A.(N-i-1)> ∧ 0 <= n+1 <= N>
+	[LEIBNITZ (SACO PARTE IZQUIERDA, MAS LEGIBLE)]
+r and A.n = A.(N-n-1) = r and <∀i : n <= i < n+1 : A.i = A.(N-i-1)> ∧ 0 <= n+1 <= N>
+	[RANGO UNITARIO]
+r and A.n = A.(N-n-1) = r and A.n = A.(N-n-1) ∧ 0 <= n+1 <= N
+	[LÒGICA (SI SE CUMPLE (0 <= n <= N y n <> N entonces 0 <= n < N) entonces se cumple 0 <= n+1 <= N)]
+r and A.n = A.(N-n-1) = r and A.n = A.(N-n-1) ∧ True
+	[LÒGICA]
+r and A.n = A.(N-n-1) = r and A.n = A.(N-n-1)
+	[LÒGICA]
+True
+
+--Variante(a)
+--v = N-n
+--(I ∧ Bn) -> v >= 0
+r = <∀i : 0 <= i < n : A.i = A.(N-i-1)> ∧ 0 <= n <= N ∧ n <> N -> N-n >= 0
+    [ARITMETICA]
+r = <∀i : 0 <= i < n : A.i = A.(N-i-1)> ∧ 0 <= n <= N ∧ n <> N -> N >= n
+    [ARITMETICA (LEIBNITZ)]
+r = <∀i : 0 <= i < n : A.i = A.(N-i-1)> ∧ 0 <= n <= N ∧ n <> N -> N > n
+    [LEIBNITZ]
+r = <∀i : 0 <= i < n : A.i = A.(N-i-1)> ∧ 0 <= n <= N ∧ n <> N -> True
+    [LÓGICA]
+True
+
+--Variante(b)
+--{I ∧ Bn ∧ v = A} Sn {v < A}
+{r = <∀i : 0 <= i < n : A.i = A.(N-i-1)> ∧ (0 <= n <= N) ∧ (n <> N) ∧ (N-n = A)}
+n, r := n+1, r and A.n = A.(N-n-1)
+{N-n < A}
+    [DEF WP]
+r = <∀i : 0 <= i < n : A.i = A.(N-i-1)> ∧ (0 <= n <= N) ∧ (n <> N) ∧ (N-n = A) ->
+wp.(n, r := n+1, r and A.n = A.(N-n-1)).(N-n < A)
+    [DEF SUSTITUCIÓN WP, SACO PARTE IZQUIERDA PARA MEJOR LECTURA]
+N-n+1 < A
+    [LEIBNITZ]
+A+1 < A
+    [LÓGICA]
+False
+
+------------------------------------------------------------------------------
+--PRÁCTICO PARCIAL #1
+------------------------------------------------------------------------------
+--EJERCICIO 1: Especificar y derivar un programa funcional que, dada una secuencia
+-- de números, devuelva la longitud de la secuencia inicial ordenada más larga
+
+f.xs = <Max as, bs : xs = as++bs ∧ ordenada(as): #as>
+
+--CB xs = []
+f.[]
+    [ESPECIFICACIÓN]
+<Max as, bs : [] = as++bs : #as>
+    [PROPIEDAD DE ++]
+<Max as, bs : [] = as++bs ∧ as = [] ∧ bs = [] : #as>
+    [RANGO UNITARIO, TERMINO CONSTANTE]
+#[]
+    [DEF CARDINAL]
+0
+
+--CI xs = x:xs
+--HI f.xs = <Max as, bs : xs = as++bs : #as>
+f.(x:xs)
+    [ESPECIFICACIÓN]
+<Max as, bs : (x:xs) = as++bs : #as>
+    [PARTICIÓN DE RANGO]
+<Max as, bs : (x:xs) = as++bs ∧ bs = [] : #as> 
+'Max' 
+<Max as, bs : (x:xs) = as++bs ∧ bs /= []: #as>
+    [as <- (a:as) EN EL SEGUNDO TERMINO, YA QUE NO ES VACIO]
+<Max bs : bs = [] : <Max as : (x:xs) = as++bs ∧ bs = [] : #as>> 
+'Max' 
+<Max as, bs : (x:xs) = as++(b:bs) ∧ (b:bs) /= []: #as>
+    [RANGO UNITARIO, DEF ++]
+<Max as : (x:xs) = as : #as> 
+'Max' 
+<Max as, bs : (x:xs) = as++(b:bs) ∧ (b:bs) /= []: #as>
+    [DEF ++, IGUALDAD DE LISTAS]
+<Max as : (x:xs) = as : #as> 
+'Max' 
+<Max as, b, bs : x = b ∧ xs = as++bs : #as>
+    [RANGO UNITARIO]
+<Max as : (x:xs) = as : #as> 
+'Max' 
+<Max as, bs : xs = as++bs : #as>
+    [HI]
+<Max as : (x:xs) = as : #as> 'Max' f.xs
+    [Introducción de g.xs = <Max as : (x:xs) = as : #as>]
+g.(x:xs) 'Max' f.xs
+
+--PARA CERRAR
+f.[] = 0
+f.(x:xs) = g.(x:xs) 'Max' f.xs
+
+------------------------------------------------------------------------------
+--EJERCICIO 2: Calcular wp del siguiente programa
+-- {wp}
+-- if a >= b -> a := a-b;
+-- [] b >= a -> b := b-a;
+-- fi
+-- {a > 0 ∧ b > 0}
+
+--wp.if.Q = (B0 v B1 v...v Bn) ∧ (B0 -> wp.S0.Q) ∧...∧ (Bn -> wp.Sn.Q) 
+(a >= b v b >= a) ∧ (a >= b -> wp.(a := a-b).(a > 0 ∧ b > 0))
+    ∧ (b >= a -> wp.(b := b-a).(a > 0 ∧ b > 0))
+
+a >= b v b >= a
+    [ARITMETICA]
+a >= b v a <= b
+    [LÓGICA]
+True
+
+a >= b -> wp.(a := a-b).(a > 0 ∧ b > 0)
+    [DEF SUSTITUCIÓN WP]
+a >= b -> a-b > 0 ∧ b > 0
+    [ARITMETICA]
+a >= b -> a > b ∧ b > 0
+    [LEIBNITZ]
+a >= b -> True ∧ b > 0
+    [NEUTRO ∧]
+a >= b -> b > 0
+    [LEIBNITZ]
+b > 0
+
+b >= a -> wp.(b := b-a).(a > 0 ∧ b > 0)
+    [DEF SUSTITUCIÓN WP]
+b >= a -> a > 0 ∧ b-a > 0
+    [ARITMETICA]
+b >= a -> a > 0 ∧ b > a
+    [LEIBNITZ]
+b >= a -> a > 0 ∧ True
+    [NEUTRO ∧]
+b >= a -> a > 0
+    [LEIBNITZ]
+a > 0
+
+True ∧ b > 0 ∧ a > 0
+    [NEUTRO ∧]
+b > 0 ∧ a > 0
+
+WEAKEST PRECONDITION: b > 0 ∧ a > 0
+
+------------------------------------------------------------------------------
+--EJERCICIO 3: Demostrar la siguiente corrección parcial
+-- var i, k: Int;
+-- cons N: Int;
+-- array b[0, N] of Int;
+-- {N > 0}
+-- i, k := 1,0;
+-- do i < N ∧ b[i] <= b[k] -> i := i+1
+-- [] i < N ∧ b[i] >= b[k] -> k, i := i, i+1
+-- od
+-- {<∀j : 0 <= j < N : b[k] >= b[j]>}
+
+--AL SER CORRECCIÓN PARCIAL DEBEMOS DEMOSTRAR:
+-- Inicialización: {P}S{I}
+-- Postcondición: (I ∧ -B0 ∧ -B1 ∧...∧ -Bn) -> Q
+-- Invariante: {Bn ∧ I} Sn {I}
+
+--DEBEMOS AVERIGUAR I
+{I: i <= N ∧ i >= k}
+
+--Inicialización
+--{P}S{I}
+{N > 0} i, k := 1, 0 {i <= N ∧ i >= k}
+    [DEF WP]
+N > 0 -> wp.(i, k := 1, 0).(i <= N ∧ i >= k)
+    [DEF ASIGNACIÓN WP]
+N > 0 -> 1 <= N ∧ 1 >= 0
+    [ARITMETICA]
+N > 0 -> N >= 1 ∧ 1 >= 0
+    [LÓGICA]
+N > 0 -> N >= 1 ∧ True
+    [NEUTRO ∧]
+N > 0 -> N >= 1
+    [LÓGICA, LEIBNITZ]
+    [(como n > 0 entonces va a ser que n es mayor o igual al sig, es decir n >= 1)]
+True
+
+--Postcondición
+--(I ∧ -B0 ∧ -B1 ∧...∧ -Bn) -> Q
+(i <= N ∧ i >= k) ∧ -(i < N ∧ b[i] <= b[k]) ∧ -(i < N ∧ b[i] >= b[k]) 
+-> <∀i : 0 <= i < N : b[k] >= b[i]>
+    [DE MORGAN]
+(i <= N ∧ i >= k) ∧ (-(i < N) v -(b[i] <= b[k])) ∧ (-(i < N) v -(b[i] >= b[k])) 
+-> <∀i : 0 <= i < N : b[k] >= b[i]>
+    [ARITMETICA]
+(i <= N ∧ i >= k) ∧ (i >= N v b[i] > b[k]) ∧ (i >= N v b[i] < b[k]) 
+-> <∀i : 0 <= i < N : b[k] >= b[i]>
+    [LÓGICA]
+(i <= N ∧ i >= k) ∧ (i < N v b[i] = b[k]) -> <∀i : 0 <= i < N : b[k] >= b[i]>
+    [LEIBNITZ]
+(i <= N ∧ i >= k) ∧ (i < N v b[i] = b[k]) -> <∀i : 0 <= i < N : True>
+    [TERMINO CONSTANTE]
+(i <= N ∧ i >= k) ∧ (i < N v b[i] = b[k]) -> True
+    [LEIBNITZ]
+True
+
+--Invariante
+--{Bn ∧ I} Sn {I}
+{i < N ∧ b[i] <= b[k] ∧ i <= N ∧ i >= k} i := i+1 {i <= N ∧ i >= k}
+    [DEF WP]
+i < N ∧ b[i] <= b[k] ∧ i <= N ∧ i >= k -> wp.(i := i+1).(i <= N ∧ i >= k)
+    [DEF ASIGNACIÓN WP]
+i < N ∧ b[i] <= b[k] ∧ i <= N ∧ i >= k -> i+1 <= N ∧ i+1 >= k
+    [ARITMETICA]
+    [si i <= N, i >= k entonces tambien se cumple que i+1 <= N, i+1 >= k]
+i < N ∧ b[i] <= b[k] ∧ i <= N ∧ i >= k -> True
+    [LÓGICA]
+True
+
+{i < N ∧ b[i] >= b[k] ∧ i <= N ∧ i >= k} k, i := i, i+1 {i <= N ∧ i >= k}
+    [DEF WP]
+i < N ∧ b[i] >= b[k] ∧ i <= N ∧ i >= k -> wp.(k, i := i, i+1).(i <= N ∧ i >= k)
+    [DEF ASIGNACIÓN WP]
+i < N ∧ b[i] >= b[k] ∧ i <= N ∧ i >= k -> i+1 <= N ∧ i+1 >= i
+    [ARITMETICA]
+    [si i <= N entonces tambien se cumple que i+1 <= N]
+    [i+1 > i siempre]
+i < N ∧ b[i] >= b[k] ∧ i <= N ∧ i >= k -> True
+    [LÓGICA]
+True
+
+------------------------------------------------------------------------------
+--EJERCICIO 4: Encontrar predicados P que se cumplan:
+{x= A ∧ y= B}
+x := x-y;
+y := x+y;
+x := y-x;
+{x= B ∧ y= A}
+
+------------------------------------------------------------------------------
+--EJERCICIO 5: Encontrar predicados P que se cumplan:
+-- {P} x,y := y*x, x*y {x+y > 0}
+{P} x,y := y*x, x*y {x+y > 0}
+    [DEF WP]
+wp.(x,y := y*x, x*y).(x+y > 0)
+    [DEF ASIGNACIÓN WP]
+y*x+x*y > 0
+P: (x > 0 ∧ y > 0) v (x < 0 ∧ y < 0)
+
+-- {P} a := a ≡ b {a}
+{P} a := a ≡ b {a}
+    [DEF WP]
+wp.(a := a ≡ b).a
+    [DEF ASIGNACIÓN WP]
+a ≡ b
+P: b = a
+
+------------------------------------------------------------------------------
+--EJERCICIO 5: Demostrar que skip;skip es equivalente a skip
+-- {P} skip {Q} = {P} skip {Q}; {P} skip {Q}
+{P} skip {Q} = {P} skip {Q}; {P} skip {Q}
+    [DEF WP]
+wp.skip.Q = wp.skip.(wp.skip.Q)
+    [DEF SKIP WP, lado derecho]
+wp.skip.Q = wp.skip.Q
+    [LÓGICA]
+True
+
+--EJERCICIO 6: Determinar wp de
+-- x := x+1;
+-- if x > 0 -> x := x-1;
+-- [] x < 0 -> x := x+2;
+-- [] x = 1 -> skip;
+-- fi
+-- {x >= 1}
+
+--CONCATENACIÓN DE WP: wp.S1.(wp.S2.Q)
+-- S1: x := x+1, S2: if
+-- Demostrar S2
+wp.S2.Q
+    [DEF WP IF]
+(x > 0 v x < 0 v x = 1) 
+∧ (x > 0 -> wp.(x := x-1).(x >= 1))
+∧ (x < 0 -> wp.(x := x+2).(x >= 1))
+∧ (x = 1 -> wp.skip.(x >= 1))
+
+(x > 0 v x < 0 v x = 1)
+    [ARITMETICA]
+x <> 0 v x = 1
+
+x > 0 -> wp.(x := x-1).(x >= 1)
+    [DEF ASIGNACIÓN WP]
+x > 0 -> x-1 >= 1
+    [ARITMETICA]
+x > 0 -> x >= 2
+    [LEIBNITZ]
+True
+
+x < 0 -> wp.(x := x+2).(x >= 1)
+    [DEF ASIGNACIÓN WP]
+x < 0 -> x+2 >= 1
+    [ARITMETICA]
+x < 0 -> x >= -1
+    [LEIBNITZ]
+x >= -1
+
+x = 1 -> wp.skip.(x >= 1)
+    [DEF WP SKIP]
+x = 1 -> x >= 1
+    [LEIBNITZ]
+True
+
+--JUNTANDO TODAS LAS CONJUNCIONES
+x <> 0 v x = 1 ∧ True ∧ x >= -1 ∧ True
+    [NEUTRO ∧]
+x <> 0 v x = 1 ∧ x >= -1
+
+wp.S1.(x <> 0 v x = 1 ∧ x >= -1)
+    [DEF S1]
+wp.(x := x+1).(x <> 0 v x = 1 ∧ x >= -1)
+    [DEF SUSTITUCIÓN WP]
+x+1 <> 0 v x+1 = 1 ∧ x+1 >= -1
+    [ARITMETICA]
+x <> -1 v x = 0 ∧ x >= -2
+    [ARITMETICA]
+x = -2 v x = 0
+
+WEAKEST PRECONDITION: x = -2 v x = 0
+
+------------------------------------------------------------------------------
+--PRÁCTICO PARCIAL #2
+------------------------------------------------------------------------------
+--EJERCICIO 1: Especificar y derivar un programa funciona que, dada una secuencia
+-- de números, devuelva la longitud de la secuencia final de ceros más larga
+f.xs = <Max as, bs : xs = as++bs ∧ ceros.bs : #bs>
+    where ceros.xs = <∀n : 0 <= n < #xs : xs.n = 0>
+
+--CB xs = []
+f.[]
+    [ESPECIFICACIÓN]
+<Max as, bs : [] = as++bs ∧ ceros.bs : #bs>
+    [PROPIEDAD DE ++]
+<Max as, bs : [] = as++bs ∧ as = [] ∧ bs = [] ∧ #ceros.bs : #bs>
+    [RANGO UNITARIO, TERMINO CONSTANTE]
+#[]
+    [DEF CARDINAL]
+0
+
+--CI xs = x:xs
+f.(x:xs)
+    [ESPECIFICACIÓN]
+<Max as, bs : (x:xs) = as++bs : #ceros.bs>
+
+TU VIEJA DERIVA ESO
+
+------------------------------------------------------------------------------
+--EJERCICIO 2: Decir si los siguientes programas son parcial o totalmente correctos.
+-- Demostrarlos.
+-- {True}
+-- do True -> skip
+-- od
+-- {True}
+-- {I = True}
+
+-- Corrección parcial
+-- Inicialización: {P}S{I}
+-- Postcondición: (I ∧ -B0 ∧...∧ -Bn) -> Q
+-- Invariante: {I ∧ Bn} Sn {I}
+
+--Inicialización
+{True} True {True} que es True
+
+--Postcondición
+True ∧ False -> True
+    [LÓGICA]
+False -> True
+    [LÓGICA]
+True
+
+--Invariante
+{True ∧ True} skip {True}
+    [DEF WP]
+True -> wp.skip.True
+    [DEF SKIP WP]
+True
+
+-- Corrección total
+-- Variante(a): (I ∧ Bn) -> v >= 0
+-- Variante(b): {I ∧ Bn ∧ v = A} Sn {v < A}
+
+-- Variante(a)
+{True ∧ True ∧ v = A} -> skip {v < A}
+    [DEF WP]
+True ∧ True ∧ v = A -> wp.skip.(v < A)
+    [NEUTRO ∧]
+v = A -> v < A
+    [LÓGICA]
+Falso
+
+COMO ES FALSO NO TENEMOS CORRECCION TOTAL PERO SI PARCIAL
+
+------------------------------------------------------------------------------
+--EJERCICIO 3: Probar que es correcto
+-- {True}
+-- if x >= y -> skip
+-- [] y >= x -> x, y := y, x
+-- fi
+-- {x >= y}
+
+--Dem if:
+-- I. [True -> x >= y v y >= x]
+-- II. {True ∧ x >= y} skip {x >= y}
+-- III. {True ∧ y >= x} x,y := y,x {x >= y}
+
+True -> x >= y v y >= x
+    [LÓGICA]
+True -> True
+    [LÓGICA]
+True
+
+{True ∧ x >= y} skip {x >= y}
+    [DEF WP]
+True ∧ x >= y -> wp.skip.(x >= y)
+    [DEF SKIP WP, NEUTRO ∧]
+x >= y -> x >= y
+    [LEIBITZ]
+True
+
+{True ∧ y >= x} x,y := y,x {x >= y}
+    [DEF WP]
+True ∧ y >= x -> wp.(x,y := y,x).(x >= y)
+    [NEUTRO ∧, DEF ASIGNACIÓN WP]
+y >= x -> y >= x
+    [LEIBNITZ]
+True
+
+ES CORRECTO
+
+------------------------------------------------------------------------------
+--EJERCICIO 5: Demostrar la corrección
+-- {N >= 0}
+-- x, y := 0,1
+-- do x /= N -> x, y := x+1, y+y
+-- od
+-- {y = 2*N}
+
+--Sacar I
+--x = 0, y = 1, N = 3
+0 /= 3 -> 0+1,1+1 -> 1,2
+1 /= 3 -> 1+1,2+2 -> 2,4
+2 /= 3 -> 2+1,4+4 -> 3,8
+3 /= 3
+
+I: x <= N ∧ y = 2^x ∧ x < y
+v: N-x
+
+-- Inicialización: {P}S{I}
+-- Postcondición: (I ∧ -B0 ∧..∧ -Bn) -> Q
+-- Invariante: {I ∧ Bn} Sn {I}
+-- Variante(a): (I ∧ Bn) -> v >= 0
+-- Variante(b): {I ∧ Bn ∧ v = A} Sn {v < A}
+
+-- Inicialización
+{N >= 0} x, y := 0,1 {x <= N ∧ y = 2^x ∧ x < y}
+    [DEF WP]
+N >= 0 -> wp.(x, y := 0,1).(x <= N ∧ y = 2^x ∧ x < y)
+    [DEF SUSTITUCIÓN WP]
+N >= 0 -> 0 <= N ∧ 1 = 2^0 ∧ 0 < 1
+    [LEIBNITZ, ARITMETICA]
+N >= 0 -> True ∧ True ∧ True
+    [LÓGICA]
+True
+
+-- Postcondición
+x <= N ∧ y = 2^x ∧ x < y ∧ x = N -> y = 2*N
+    [LEIBNITZ]
+x <= N ∧ y = 2^x ∧ x < y ∧ x = N -> 2^x = 2^x
+    [LÓGICA]
+x <= N ∧ y = 2^x ∧ x < y ∧ x = N -> True
+    [LÓGICA]
+True
+
+-- Invariante
+{x <= N ∧ y = 2^x ∧ x < y ∧ x <> N} x, y := x+1, y+y {x <= N ∧ y = 2^x ∧ x < y}
+    [DEF WP]
+x <= N ∧ y = 2^x ∧ x < y ∧ x <> N -> wp.(x, y := x+1, y+y).(x <= N ∧ y = 2^x ∧ x < y)
+    [DEF ASIGNACIÓN WP]
+x <= N ∧ y = 2^x ∧ x < y ∧ x <> N -> x+1 <= N ∧ y+y = 2^x+1 ∧ x+1 < y+y
+    [LEIBNITZ, LÓGICA]
+x <= N ∧ y = 2^x ∧ x < y ∧ x <> N -> True ∧ True ∧ True
+    [LÓGICA]
+True
+
+-- Variante(a)
+(x <= N ∧ y = 2^x ∧ x < y ∧ x <> N) -> N-x >= 0
+    [ARITMETICA]
+(x <= N ∧ y = 2^x ∧ x < y ∧ x <> N) -> N >= x
+    [LEIBNITZ]
+(x <= N ∧ y = 2^x ∧ x < y ∧ x <> N) -> True
+    [LÓGICA]
+True
+
+-- Variante(b)
+{x <= N ∧ y = 2^x ∧ x < y ∧ x <> N ∧ N-x = A} x, y := x+1, y+y {N-x < A}
+    [DEF WP]
+x <= N ∧ y = 2^x ∧ x < y ∧ x <> N ∧ N-x = A -> wp.(x, y := x+1, y+y).(N-x < A)
+    [DEF ASIGNACIÓN WP]
+x <= N ∧ y = 2^x ∧ x < y ∧ x <> N ∧ N-x = A -> N-(x+1) < A
+    [ARITMETICA]
+x <= N ∧ y = 2^x ∧ x < y ∧ x <> N ∧ N-x = A -> N-x-1 < A
+    [LEIBNITZ]
+x <= N ∧ y = 2^x ∧ x < y ∧ x <> N ∧ N-x = A -> A-1 < A
+    [LÓGICA]
+x <= N ∧ y = 2^x ∧ x < y ∧ x <> N ∧ N-x = A -> True
+    [LÓGICA]
+True
+
+------------------------------------------------------------------------------
+--EJERCICIO 6: Hacer un programa imperativo que dadas dos variables enteras,
+-- calcule en una de ellas el mínimo. Especificar y demostrar.
+{True}
+if x >= y -> x := y; 
+[] x < y -> skip;
+fi
+{x <= y}
+
+-- P -> B0 v...v Bn
+-- {P ∧ Bn} Sn {Q}
+True -> x >= y v x < y
+    [LÓGICA]
+True -> True
+    [LÓGICA]
+True
+
+{True ∧ x >= y} x := y {x <= y}
+    [DEF WP]
+True ∧ x >= y -> wp.(x := y).(x <= y)
+    [NEUTRO ∧, DEF ASIGNACIÓN WP]
+x >= y -> y <= y
+    [LÓGICA]
+x >= y -> True
+    [LÓGICA]
+True
+
+{True ∧ x < y} skip {x <= y}
+    [DEF WP]
+True ∧ x < y -> wp.skip.(x <= y)
+    [NEUTRO ∧, DEF SKIP WP]
+x < y -> x <= y
+    [LEIBNITZ]
+x < y -> True
+    [LÓGICA]
+True
+
+------------------------------------------------------------------------------
+--EJERCICIO 7: Programa en funcional que diga si un numero es potencia de dos
+f.n = <∃i : 0 <= i < n : n = 2^i>
+
+--CB n = 0
+f.0
+    [ESPECIFICACIÓN]
+<∃i : 0 <= i < 0 : n = 2^i>
+    [RANGO VACIO]
+False
+
+--CI n = n+1
+--HI f.n = <∃i : 0 <= i < n : n = 2^i>
+f.n+1
+    [ESPECIFICACIÓN]
+<∃i : 0 <= i < n+1 : n+1 = 2^i>
+    [SEPARACIÓN DE TERMINOS]
+<∃i : 0 <= i < n : n+1 = 2^i> v <∃i : n <= i < 1 : n+1 = 2^i>
+    [RANGO UNITARIO]
+<∃i : 0 <= i < n : n+1 = 2^i> v n+1 = 2^n
+    
+    GENERALIZAMOS g.n.x = <∃i : 0 <= i < n : n+x = 2^i>
+    --CB n = 0
+    n.0
+        [ESPECIFICACIÓN]
+    <∃i : 0 <= i < 0 : 0+x = 2^i>
+        [RANGO VACIO]
+    False
+
+    --CI n = n+1
+    n.n+1.x
+        [ESPECIFICACIÓN]
+    <∃i : 0 <= i < n+1 : n+1+x = 2^i>
+        [PARTICIÓN DE RANGO]
+    <∃i : 0 <= i < n : n+1+x = 2^i> v <∃i : n <= i < 1 : n+1+x = 2^i>
+        [RANGO UNITARIO]
+    <∃i : 0 <= i < n : n+1+x = 2^i> v n+1+x = 2^n
+        [HI]
+    g.n.(1+x) v n+1+x = 2^n
+
+-- PARA CERRAR
+f.0 = False
+f.(n+1) = g.n.0
+
+------------------------------------------------------------------------------
+--EJERCICIO 8: Encontrar E
+-- {True} i, s := 0, E {∑j : 0 <= j < i : a[i]}
+{True} i, s := 0, E {s = Sum j : 0 <= j < i : a[i]}
+    [DEF WP]
+wp.(i, s := 0, E).(s = Sum j : 0 <= j < i : a[i])
+    [DEF ASIGNACIÓN WP]
+E = <Sum j : 0 <= j < 0 : a[0]>
+    [RANGO VACIO]
+E = 0
+
+{True} i, s := 0, E {s = Sum j : 0 <= j <= i : a[i]}
+    [DEF WP]
+wp.(i, s := 0, E).(s = Sum j : 0 <= j <= i : a[i])
+    [DEF ASIGNACIÓN WP]
+E = Sum j : 0 <= j <= 0 : a[0]
+    [RANGO UNITARIO]
+E = a[0]
