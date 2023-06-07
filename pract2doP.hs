@@ -1762,3 +1762,271 @@ wp.(i, s := 0, E).(s = Sum j : 0 <= j <= i : a[i])
 E = Sum j : 0 <= j <= 0 : a[0]
     [RANGO UNITARIO]
 E = a[0]
+
+------------------------------------------------------------------------------
+--REPASO LÓGICA PROPOSICIONAL
+------------------------------------------------------------------------------
+--EJERCICIO 1: Demostrar
+-- P -> Q ≡ -P v Q
+P -> Q
+    [DEF ->]
+P v Q ≡ Q
+    [NEUTRO v]
+P v Q ≡ Q v False
+    [(A v B) ≡ (A v C) ≡ A v (B ≡ C)]
+Q v (P ≡ False)
+    [CONTRAPOSITIVA]
+Q v -P
+    [CONMUTATIVA]
+-P v Q
+
+--(P -> Q) v (Q -> P)
+(P -> Q) v (Q -> P)
+    [P -> Q ≡ -P v Q]
+(-P v Q) v (-Q v P)
+    [CONMUTATIVA, ASOCIATIVA v]
+(-P v P) v (-Q v Q)
+    [TERCERO EXCLUIDO]
+True v True
+    [ABSORCIÓN]
+True
+
+-- P v (P ∧ Q) ≡ P
+P v (P ∧ Q) ≡ P
+    [REGLA DORADA]
+(P ∧ Q) ∧ P ≡ P ∧ Q
+    [CONMUTATIVA, ASOCIATIVA ∧]
+(P ∧ P) ∧ Q ≡ P ∧ Q
+    [IDEMPOTENCIA]
+P ∧ Q ≡ P ∧ Q
+    [NEUTRO ≡]
+True
+
+------------------------------------------------------------------------------
+--EJERCICIO 2: Averiguar quienes son caballeros y quienes mentirosos
+-- A dice: yo soy un caballero y B es un mentiroso
+A ≡ A ∧ -B
+    [REGLA DORADA]
+-B ≡ -B v A
+    [NEUTRO v]
+-B v False ≡ -B v A
+    [(A v B) ≡ (A v C) ≡ A v (B ≡ C)]
+-B v (False ≡ A)
+    [CONTRAPOSITIVA]
+-B v -A
+
+-- A dice: yo soy un mentiroso y B es un caballero
+A ≡ -A ∧ B
+    [REGLA DORADA]
+A ≡ -A ≡ B ≡ B v -A
+    [NEUTRO v]
+A ≡ -A ≡ B v False ≡ B v -A
+    [(A v B) ≡ (A v C) ≡ A v (B ≡ C)]
+A ≡ -A ≡ B v (False ≡ -A)
+    [CONTRAPOSITIVA]
+A ≡ -A ≡ B v A
+    [CONTRAPOSITIVA]
+False ≡ B v A
+    [CONTRAPOSITIVA]
+-B v -A
+
+-- A dice: yo soy un caballero y B es un caballero
+A ≡ A ∧ B
+    [REGLA DORADA]
+B ≡ B v A
+    [NEUTRO v]
+B v False ≡ B v A
+    [(A v B) ≡ (A v C) ≡ A v (B ≡ C)]
+B v (False ≡ A)
+    [CONTRAPOSITIVA]
+B v -A
+
+-- Nos encontramos con A y B, A dice: al menos uno de nosotros es un mentiroso
+A ≡ -A v -B
+    [REGLA DORADA]
+A ≡ -A ≡ -B ≡ -B ∧ -A
+    [CONTRAPOSITIVA]
+False ≡ -B ≡ -B ∧ -A
+    [REGLA DORADA]
+False ≡ -A ≡ -A v -B
+    [NEUTRO v]
+False ≡ -A v False ≡ -A v -B
+    [(A v B) ≡ (A v C) ≡ A v (B ≡ C)]
+False ≡ -A v (False ≡ -B)
+    [CONTRAPOSITIVA]
+False ≡ -A v B
+    [CONTRAPOSITIVA]
+A v -B
+
+-- A dice: yo soy un mentiroso o B es un caballero
+A ≡ -A v B
+    [REGLA DORADA]
+A ≡ -A ≡ B ≡ B ∧ -A
+    [CONTRAPOSITIVA]
+False ≡ B ≡ B ∧ -A
+    [REGLA DORADA]
+False ≡ -A ≡ -A v B
+    [NEUTRO v]
+False ≡ -A v False ≡ -A v B
+    [(A v B) ≡ (A v C) ≡ A v (B ≡ C)]
+False ≡ -A v (False ≡ B)
+    [CONTRAPOSITIVA]
+False ≡ -A v -B
+    [CONTRAPOSITIVA]
+A v B
+
+-- Le preguntan a A si es un caballero, A dice: Si soy un caballero, entonces me
+-- comere el sombrero. Demostrar que A se tiene que comer el sombrero
+A ≡ A -> S
+    [P -> Q ≡ -P v Q]
+A ≡ -A v S
+    [REGLA DORADA]
+A ≡ -A ≡ S ≡ S ∧ -A
+    [CONTRAPOSITIVA]
+False ≡ S ≡ S ∧ -A
+    [REGLA DORADA]
+False ≡ -A ≡ -A v S
+    [NEUTRO v]
+False ≡ -A v False ≡ -A v S
+    [(A v B) ≡ (A v C) ≡ A v (B ≡ C)]
+False ≡ -A v (False ≡ S)
+    [CONTRAPOSITIVA]
+False ≡ -A v -S
+    [CONTRAPOSITIVA]
+A v S
+
+------------------------------------------------------------------------------
+--EJERCICIO 3: Dada la definición de N
+-- <Ni : Ri : Ti> = <∑i : Ri ∧ Ti : 1>
+
+--Enunciar y demostrar la regla de partición de rango de la contatoria
+<Ni : Ri v Si : Ti>
+    [DEF N]
+<∑i : (Ri v Si) ∧ Ti : 1>
+    [DISTRIBUTIVA]
+<∑i : (Ri ∧ Ti) v (Si ∧ Ti) : 1>
+    [PARTICIÓN DE RANGO]
+<∑i : Ri ∧ Ti : 1> + <∑i : Si ∧ Ti : 1>
+    [DEF N]
+<Ni : Ri : Ti> + <Ni : Si : Ti>
+
+--Idem con la regla del rango vacio
+<Ni : false : Ti>
+    [DEF N]
+<∑i : False ∧ Ti : 1>
+    [LÓGICA]
+<∑i : False : 1>
+    [RANGO VACIO]
+0
+
+--Probar <∑i : Ri ∧ Ti : K> = K*<Ni : Ri : Ti>
+K*<Ni : Ri : Ti>
+    [DEF N]
+K*<∑i : Ri ∧ Ti : 1>
+    [DISTRIBUTIVA DE K]
+<∑i : Ri ∧ Ti : K*1>
+    [ARITMETICA]
+<∑i : Ri ∧ Ti : K>
+
+------------------------------------------------------------------------------
+--EJERCICIOS DE REPASO
+------------------------------------------------------------------------------
+--EJERCICIO 1: Dada la siguiente especificación y sea xs una lista no vacía, 
+-- expresar la especificación en lenguaje natural, dando su enunciado.
+-- f.xs = <∃ as, bs, cs : xs = as++bs++cs ∧ #bs>1 : capicua.bs>
+
+DADA UNA LISTA NO VACIA, ENCONTRAR UN SUBSEGMENTO DE LA MISMA QUE SEA CAPICUA
+
+--Especifica capicua.xs
+capicua.xs = <∀i : 0 <= i < #xs : xs.i = xs.(#xs-i-1)>
+
+--Dadas las funciones split3 : [a]− > [([a], [a], [a])] y split2 : [a]− > [([a], [a])]
+--,escribir la especificación de f usando listas por comprensión.
+split2.xs = [(take n xs, drop n xs) | n <- [0..#xs]]
+split3.xs = [(as, bs, cs) | (as, ys) <- split2 xs, (bs, cs) <- split2 ys]
+
+f.xs
+    | length xs > 1 && foldl (||) False (split3 xs) = capicua.xs
+    | otherwise = False
+
+------------------------------------------------------------------------------
+--EJERCICIO 2: Expresar en lenguaje natural y derivar
+f.xs.ys = #xs = #ys ∧ <∀i : 0<= i <#xs : xs.i = ys.i>
+
+LO QUE TENEMOS ES UNA FUNCIÓN QUE COMPRUEBA QUE AMBAS LISTAS SEAN IGUALES
+
+--CB xs = []
+f.[].ys 
+    [ESPECIFICACIÓN]
+#[] = #ys ∧ <∀i : 0<= i <#[] : [].i = ys.i>
+    [DEF CARDINAL]
+0 = #ys ∧ <∀i : 0<= i <0 : [].i = ys.i>
+    [RANGO VACIO]
+0 = #ys ∧ True
+    [NEUTRO ∧]
+#ys = 0
+
+--CB ys = []
+f.xs.[] 
+    [ESPECIFICACIÓN]
+#xs = #[] ∧ <∀i : 0<= i <#xs : xs.i = [].i>
+    [DEF CARDINAL, DEF POSICIÓN]
+#xs = 0 ∧ <∀i : 0<= i <#xs : xs.i = 0>
+    [LÓGICA]
+#xs = 0
+
+--CB xs, ys = []
+f.[].[] 
+    [ESPECIFICACIÓN]
+#[] = #[] ∧ <∀i : 0<= i <#[] : [].i = [].i>
+    [DEF CARDINAL, RANGO VACIO]
+True ∧ True
+    [LÓGICA]
+True
+
+--CI xs, ys = x:xs, y:ys
+--HI f.xs.ys = #xs = #ys ∧ <∀i : 0 <= i < #xs : xs.i = ys.i>
+f.(x:xs).(y:ys)
+    [ESPECIFICACIÓN]
+#(x:xs) = #(y:ys) ∧ <∀i : 0 <= i < #(x:xs) : (x:xs).i = (y:ys).i>
+    [DEF CARDINAL]
+1+#xs = 1+#ys ∧ <∀i : 0 <= i < 1+#xs : (x:xs).i = (y:ys).i>
+    [LÓGICA, PARTICIÓN DE RANGO]
+1+#xs = 1+#ys ∧ <∀i : 0 <= i < 1 : (x:xs).i = (y:ys).i> 
+ ∧ <∀i : 1 <= i < 1+#xs : (x:xs).i = (y:ys).i>
+    [RANGO UNITARIO]
+1+#xs = 1+#ys ∧ (x:xs).0 = (y:ys).0 ∧ <∀i : 1 <= i < 1+#xs : (x:xs).i = (y:ys).i>
+    [DEF POSICIÓN, i <- i+1]
+1+#xs = 1+#ys ∧ x = y ∧ <∀i : 1 <= i+1 < 1+#xs : (x:xs).(i+1) = (y:ys).(i+1)>
+    [ARITMETICA, DEF POSICIÓN, CONMUTATIVA ∧]
+x = y ∧ #xs = #ys ∧ <∀i : 0 <= i < #xs : xs.i = ys.i>
+    [HI]
+x = y ∧ f.xs.ys
+
+------------------------------------------------------------------------------
+--EJERCICIO 3: Dada la siguiente especificación, ¿Puede expresarla en lenguaje
+-- natural? Determina el invariante, sugerir el programa que la satisface.
+-- {P: N > 0}
+-- {Q: r = <Min i : 0 <= i < N : a.i>}
+
+cons N: Int;
+var r, min, x: Int;
+array a [x, N) of Int;
+
+x, min := 0, 0;
+{P: N > 0}
+do x <> N ∧ a.x <= min -> x, min := x+1, a.x;
+[] x <> N ∧ a.x > min -> x ;= x+1;
+fi
+{Q: r = <Min i : 0 <= i < N : a.i>}
+{I: x <= N}
+
+-- Inicialización
+-- {P}S{I}
+{N > 0} x, min := 0, 0 {x <= N}
+    [DEF WP HOARE]
+N > 0 -> wp.(x,min := 0, 0).(x <= N)
+    [DEF ASIGNACIÓN WP]
+N > 0 -> 0 <= N
+    [LEIBNITZ]
+True
