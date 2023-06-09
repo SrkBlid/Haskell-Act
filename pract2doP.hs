@@ -1499,7 +1499,7 @@ f.(x:xs)
     [ESPECIFICACIÓN]
 <Max as, bs : (x:xs) = as++bs : #ceros.bs>
 
-TU VIEJA DERIVA ESO
+FALTA DERIVAR
 
 ------------------------------------------------------------------------------
 --EJERCICIO 2: Decir si los siguientes programas son parcial o totalmente correctos.
