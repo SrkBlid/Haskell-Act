@@ -168,9 +168,86 @@ True
 ----------------------------------------2016A-----------------------------------------
 --------------------------------------------------------------------------------------
 -- Demostrar que la regla dorada es una tautología.
+A ∧ B ≡ A ≡ B ≡ B ∨ A ≡ True
+    [NEUTRO v]
+A ∧ B ≡ A ≡ B v False ≡ B ∨ A ≡ True
+    [(A v B) ≡ (A v C) ≡ A v (B ≡ C)]
+A ∧ B ≡ A ≡ B v (False ≡ A) ≡ True
+    [CONTRAPOSITIVA]
+A ∧ B ≡ A ≡ B v -A ≡ True
+    [REGLA DORADA]
+B ≡ B v A ≡ B v -A ≡ True
+    [NEUTRO v]
+B v False ≡ B v A ≡ B v -A ≡ True
+    [(A v B) ≡ (A v C) ≡ A v (B ≡ C)]
+B v (False ≡ A) ≡ B v -A ≡ True
+    [CONTRAPOSITIVA]
+B v -A ≡ B v -A ≡ True
+    [NEUTRO ≡]
+B v -A ≡ B v -A
+    [LÓGICA]
+True
 
 --------------------------------------------------------------------------------------
 -- Especificar y derivar una función f : [Nat] -> Nat -> Bool, tal que f.xs.k devuelve true cuando todos los elementos en posiciones mayores que k son mayores a xs.k
+f : [Nat] -> Nat -> Bool
+f.xs.k = <∀i : 0 <= i < #xs ∧ i >= k : xs.i > xs.k>
+
+--CB xs = []
+f.[].k
+    [ESPECIFICACIÓN]
+<∀i : 0 <= i < #[] ∧ i >= k : xs.i > xs.k>
+    [DEF CARDINAL]
+<∀i : 0 <= i < 0 ∧ i >= k : xs.i > xs.k>
+    [RANGO VACIO]
+True
+
+--CI xs = x:xs
+--HI f.xs.k = <∀i : 0 <= i < #xs ∧ i >= k : xs.i > xs.k>
+f.(x:xs).k
+    [ESPECIFICACIÓN]
+<∀i : 0 <= i < #(x:xs) ∧ i >= k : (x:xs).i > (x:xs).k>
+    [DEF CARDINAL]
+<∀i : 0 <= i < 1+#xs ∧ i >= k : (x:xs).i > (x:xs).k>
+    [LÓGICA, PARTICIÓN DE RANGO]
+<∀i : 0 <= i < 1 ∧ i >= k : (x:xs).i > (x:xs).k> ∧ <∀i : 1 <= i < 1+#xs ∧ i >= k : (x:xs).i > (x:xs).k>
+    [RANGO UNITARIO, DEF POSICIÓN]
+x > (x:xs).k ∧ <∀i : 1 <= i < 1+#xs ∧ i >= k : (x:xs).i > (x:xs).k>
+    [i <- i+1]
+x > (x:xs).k ∧ <∀i : 1 <= i+1 < 1+#xs ∧ i+1 >= k : (x:xs).i+1 > (x:xs).k>
+    [ARITMETICA, DEF POSICIÓN]
+x > (x:xs).k ∧ <∀i : 0 <= i < #xs ∧ i+1 >= k : xs.i > (x:xs).k>
+
+    [MODULARIZACIÓN <∀i : 0 <= i < #xs ∧ i+1 >= k : xs.i > (x:xs).k>]
+
+--CB xs = []
+g.[].k.n
+    [ESPECIFICACIÓN]
+<∀i : 0 <= i < #[] ∧ i+n >= k : [].i > (x:[]).k>
+    [DEF CARDINAL]
+<∀i : 0 <= i < 0 ∧ i+n >= k : [].i > (x:[]).k>
+    [RANGO VACIO]
+True
+
+--CI xs = y:ys
+--HI g.xs.k = <∀i : 0 <= i < #xs ∧ i+n >= k : xs.i > (x:xs).k>
+g.(y:ys).k.n
+    [ESPECIFICACIÓN]
+<∀i : 0 <= i < #(y:ys) ∧ i+n >= k : (y:ys).i > (x:(y:ys)).k>
+    [DEF CARDINAL]
+<∀i : 0 <= i < 1+#ys ∧ i+n >= k : (y:ys).i > (x:(y:ys)).k>
+    [LÓGICA, PARTICIÓN DE RANGO]
+<∀i : 0 <= i < 1 ∧ i+n >= k : (y:ys).i > (x:(y:ys)).k> ∧ <∀i : 1 <= i < 1+#ys ∧ i+n >= k : (y:ys).i > (x:(y:ys)).k>
+    [RANGO UNITARIO, DEF POSICIÓN]
+y > (x:(y:ys)).k ∧ <∀i : 1 <= i < 1+#ys ∧ i+n+1 >= k : (y:ys).i > (x:(y:ys)).k>
+    [i <- i+1, ARITMETICA]
+y > (x:(y:ys)).k ∧ <∀i : 0 <= i < #ys ∧ i+(n+1) >= k : (y:ys).i > (x:(y:ys)).k>
+    [HI]
+y > (x:(y:ys)).k ∧ g.(y:ys).k.n
+
+f.xs.k = True
+f.(x:xs).k = y > (x:(y:ys)).k ∧ g.(y:ys).k.n
+
 
 --------------------------------------------------------------------------------------
 -- Dadas las siguientes definiciones funcionales:
@@ -179,8 +256,104 @@ True
 -- Donde • es la composición funcional, demostrar:
 --	    f^n • f^m • f^h = f^(n+m+h)
 
+--CB n = 0
+f^0 • f^m • f^h = f^(0+m+h)
+    [DEF F]
+f^m • f^h = f^(m+h)
+    [HI]
+True
+
+--CI n = n+1
+f^(n+1) • f^m • f^h = f^((n+1)+m+h)
+    [DEF F]
+(f • f^n) • f^m • f^h = f^((n+1)+m+h)
+    [ASOCIATIVA •]
+f • (f^n • f^m • f^h) = f^((n+1)+m+h)
+    [HI, ARITMETICA]
+f • f^(n+m+h) = f^(1+n+m+h)
+    [PROPIEDAD]
+f^(1+n+m+h) = f^(1+n+m+h)
+    [LÓGICA]
+True
+
 --------------------------------------------------------------------------------------
 -- Especificar y derivar la siguiente función: Dada una lista de números naturales, la función P dice si la suma de elementos pares es igual a la suma de los elementos impares de la lista.
+pares : [Nat] -> Int
+pares.xs = <Σi : 0 <= i < #xs ∧ mod xs.i 2 == 0 : 1>
+
+impares : [Nat] -> Int
+impares.xs = <Σi : 0 <= i < #xs ∧ mod xs.i 2 /= 0 : 1>
+
+p : [Nat] -> Bool
+p.xs = pares.xs == impares.xs
+
+--DEMOSTRACIONES
+--CB pares = 0
+pares.[]
+    [ESPECIFICACIÓN]
+<Σi : 0 <= i < #[] ∧ mod [].i 2 == 0 : 1>
+    [DEF CARDINAL]
+<Σi : 0 <= i < 0 ∧ mod [].i 2 == 0 : 1>
+    [RANGO VACIO]
+0
+
+--CI pares = x:xs
+--HI pares.xs = <Σi : 0 <= i < #xs ∧ mod xs.i 2 == 0 : 1>
+pares.(x:xs)
+    [ESPECIFICACIÓN]
+<Σi : 0 <= i < #(x:xs) ∧ mod (x:xs).i 2 == 0 : 1>
+    [DEF CARDINAL]
+<Σi : 0 <= i < 1+#xs ∧ mod (x:xs).i 2 == 0 : 1>
+    [LÓGICA, PARTICIÓN DE RANGO]
+<Σi : 0 <= i < 1 ∧ mod (x:xs).i 2 == 0 : 1> + <Σi : 1 <= i < 1+#xs ∧ mod (x:xs).i 2 == 0 : 1> 
+    [RANGO UNITARIO]
+1 + <Σi : 1 <= i < 1+#xs ∧ mod (x:xs).i 2 == 0 : 1> 
+    [i <- i+1, ARITMETICA, DEF POSICIÓN]
+1 + <Σi : 0 <= i < #xs ∧ mod xs.i 2 == 0 : 1> 
+    [HI]
+1 + pares.xs
+
+--CB impares = 0
+impares.[]
+    [ESPECIFICACIÓN]
+<Σi : 0 <= i < #[] ∧ mod [].i 2 /= 0 : 1>
+    [DEF CARDINAL]
+<Σi : 0 <= i < 0 ∧ mod [].i 2 /= 0 : 1>
+    [RANGO VACIO]
+0
+
+--CI impares = x:xs
+--HI impares.xs = <Σi : 0 <= i < #xs ∧ mod xs.i 2 /= 0 : 1>
+impares.(x:xs)
+    [ESPECIFICACIÓN]
+<Σi : 0 <= i < #(x:xs) ∧ mod (x:xs).i 2 /= 0 : 1>
+    [DEF CARDINAL]
+<Σi : 0 <= i < 1+#xs ∧ mod (x:xs).i 2 /= 0 : 1>
+    [LÓGICA, PARTICIÓN DE RANGO]
+<Σi : 0 <= i < 1 ∧ mod (x:xs).i 2 /= 0 : 1> + <Σi : 1 <= i < 1+#xs ∧ mod (x:xs).i 2 /= 0 : 1> 
+    [RANGO UNITARIO]
+1 + <Σi : 1 <= i < 1+#xs ∧ mod (x:xs).i 2 /= 0 : 1> 
+    [i <- i+1, ARITMETICA, DEF POSICIÓN]
+1 + <Σi : 0 <= i < #xs ∧ mod xs.i 2 /= 0 : 1> 
+    [HI]
+1 + impares.xs
+
+--CB p = []
+p.[] 
+    [ESPECIFICACIÓN]
+pares.[] == impares.[]
+    [DEF PARES, DEF IMPARES]
+0 == 0
+    [LÓGICA]
+True
+
+--CI p = x:xs
+--HI p.xs = pares.xs == impares.xs
+p.(x:xs) 
+    [ESPECIFICACIÓN]
+pares.(x:xs) == impares.(x:xs)
+    [DEF PARES, DEF IMPARES]
+1 + pares.xs == 1 + impares.xs
 
 --------------------------------------------------------------------------------------
 -- Especificar y derivar un algoritmo imperativo que calcule el máximo común divisor de dos números positivos, recordar que el máximo común divisor posee las siguientes propiedades:
@@ -188,6 +361,82 @@ True
 --	    mcd.x.y = mcd.y.x
 --	    Si x > y, entonces mcd.x.y = mcd.(x-y).y
 --	    Si x < y, entonces mcd.x.y = mcd.x.(y-x)
+
+--SACAMOS WP IF: 
+(x == y -> wp.(y := x).(mcd.x.y)) 
+∧ (x < y -> wp.(x := x-y).(mcd.x.y)) 
+∧ (x > y -> wp.(y := y-x).(mcd.x.y))
+
+x == y -> wp.(y := x).(mcd.x.y)
+    [DEF ASIGNACIÓN WP]
+x == y -> mcd.x.x
+    [DEF MCD]
+x == y -> x
+    [LEIBNITZ]
+x
+
+x < y -> wp.(x := x-y).(mcd.x.y)
+    [DEF ASIGNACIÓN WP]
+x < y -> mcd.(x-y).y
+    [LEIBNITZ]
+mcd.(x-y).y
+
+x > y -> wp.(y := y-x).(mcd.x.y)
+    [DEF ASIGNACIÓN WP]
+x > y -> mcd.x.(y-x)
+    [LEIBNITZ]
+mcd.x.(y-x)
+
+WP: x ∧ mcd.(x-y).y ∧ mcd.x.(y-x)
+
+--Armamos el programa teniendo el wp como P
+
+{x ∧ mcd.(x-y).y ∧ mcd.x.(y-x)}
+if x == y -> y := x
+[] x > y -> x := x-y
+[] x < y -> y := y-x
+fi
+{mcd.x.y}
+
+--DEMOSTRACIONES
+[x ∧ mcd.(x-y).y ∧ mcd.x.(y-x) -> (x == y v x > y v x < y)]
+∧ {x ∧ mcd.(x-y).y ∧ mcd.x.(y-x) ∧ x == y} y := x {mcd.x.y}
+∧ {x ∧ mcd.(x-y).y ∧ mcd.x.(y-x) ∧ x < y} x := x-y {mcd.x.y}
+∧ {x ∧ mcd.(x-y).y ∧ mcd.x.(y-x) ∧ x > y} y := y-x {mcd.x.y}
+
+x ∧ mcd.(x-y).y ∧ mcd.x.(y-x) -> (x == y v x > y v x < y)
+    [LÓGICA]
+x ∧ mcd.(x-y).y ∧ mcd.x.(y-x) -> True
+    [LÓGICA]
+True
+
+{x ∧ mcd.(x-y).y ∧ mcd.x.(y-x) ∧ x == y} y := x {mcd.x.y}
+    [DEF WP]
+x ∧ mcd.(x-y).y ∧ mcd.x.(y-x) ∧ x == y -> wp.(y := x).(mcd.x.y)
+    [DEF ASIGNACIÓN WP]
+x ∧ mcd.(x-y).y ∧ mcd.x.(y-x) ∧ x == y -> mcd.x.x
+    [DEF MCD]
+x ∧ mcd.(x-y).y ∧ mcd.x.(y-x) ∧ x == y -> x
+    [LEIBNITZ]
+True
+
+{x ∧ mcd.(x-y).y ∧ mcd.x.(y-x) ∧ x < y} x := x-y {mcd.x.y}
+    [DEF WP]
+x ∧ mcd.(x-y).y ∧ mcd.x.(y-x) ∧ x < y -> wp.(x := x-y).(mcd.x.y)
+    [DEF ASIGNACIÓN WP]
+x ∧ mcd.(x-y).y ∧ mcd.x.(y-x) ∧ x < y -> mcd.(x-y).y
+    [LEIBNITZ]
+True
+
+{x ∧ mcd.(x-y).y ∧ mcd.x.(y-x) ∧ x > y} y := y-x {mcd.x.y}
+    [DEF WP]
+x ∧ mcd.(x-y).y ∧ mcd.x.(y-x) ∧ x > y -> wp.(y := y-x).(mcd.x.y)
+    [DEF ASIGNACIÓN WP]
+x ∧ mcd.(x-y).y ∧ mcd.x.(y-x) ∧ x > y -> mcd.x.(y-x)
+    [LEIBNITZ]
+True
+
+-- Como son todas True entonces se demuestra la función imperativa.
 
 --------------------------------------------------------------------------------------
 ----------------------------------------2016B-----------------------------------------
