@@ -446,22 +446,151 @@ True
 --	    •B dice: A y yo somos de diferente tipo
 --  ¿Qué puede deducir utilizando el cálculo proposicional dado en la materia?
 
+A ≡ (B ∧ A) v (-B ∧ -A)
+    [REGLA DORADA]
+A ≡ (A ≡ B ≡ B v A) v (-B ∧ -A)
+    [NEUTRO v]
+A ≡ (A ≡ B v False ≡ B v A) v (-B ∧ -A)
+    [A v (B ≡ C) ≡ A v B ≡ A v C]
+A ≡ (A ≡ B v (False ≡ A)) v (-B ∧ -A)
+    [CONTRAPOSITIVA]
+A ≡ (A ≡ B v -A) v (-B ∧ -A)
+    [ASOCIATIVA v, CONMUTATIVA v]
+A ≡ A ≡ -A v B v (-B ∧ -A)
+    [CONTRAPOSITIVA]
+A ≡ False v B v (-B ∧ -A)
+    [NEUTRO v]
+A ≡ B v (-B ∧ -A)
+    [DISTRIBUTIVA v]
+A ≡ (B v -B) ∧ (B v -A)
+    [TERCERO EXCLUIDO, NEUTRO ∧]
+A ≡ B v -A
+    [REGLA DORADA]
+A ≡ B ≡ -A ≡ -A ∧ B
+    [ASOCIATIVA ≡]
+A ≡ -A ≡ B ≡ -A ∧ B
+    [DEF ≡]
+False ≡ B ≡ -A ∧ B
+    [REGLA DORADA]
+False ≡ -A ≡ B v -A
+    [NEUTRO v]
+False ≡ False v -A ≡ B v -A
+    [A v (B ≡ C) ≡ A v B ≡ A v C]
+False ≡ -A v (False ≡ B)
+    [CONTRAPOSITIVO]
+False ≡ -A v -B
+    [DE MORGAN]
+False ≡ -(A ∧ B)
+    [CONTRAPOSITIVA]
+A ∧ B
+
+--Esto quiere decir que A y B son caballeros.
+
 --------------------------------------------------------------------------------------
 -- Demostrar la siguiente propiedad:
---	    <Min i : R.i : -E.i> = - <Max i : R.i : F.i>
+--	    <Min i : R.i : -E.i> ≡ -<Max i : R.i : F.i>
 
 --------------------------------------------------------------------------------------
 -- Dada la siguiente especificación de la función f : [Nat] -> [Nat] -> Bool:
 --	    f.xs.ys = <∀i, j : 0 <= i < #xs ∧ 0 <= j < #ys : xs.i - ys.j = 0>
 -- derive la función f.
 
+--CB xs = []
+f.[].ys
+    [ESPECIFICACIÓN]
+<∀i, j : 0 <= i < #[] ∧ 0 <= j < #ys : xs.i - ys.j = 0>
+    [DEF CARDINAL]
+<∀i, j : 0 <= i < 0 ∧ 0 <= j < #ys : xs.i - ys.j = 0>
+    [RANGO VACIO]
+True
+
+--CB xs = (x:xs), ys = []
+f.(x:xs).[]
+    [ESPECIFICACIÓN]
+<∀i, j : 0 <= i < #(x:xs) ∧ 0 <= j < #[] : xs.i - ys.j = 0>
+    [DEF CARDINAL]
+<∀i, j : 0 <= i < 1+#xs ∧ 0 <= j < 0 : xs.i - ys.j = 0>
+    [RANGO VACIO]
+True
+
+--CI xs = (x:xs), y = (y:ys)
+--HI f.xs.ys = <∀i, j : 0 <= i < #xs ∧ 0 <= j < #ys : xs.i - ys.j = 0>
+f.(x:xs).(y:ys) 
+    [ESPECIFICACIÓN]
+<∀i, j : 0 <= i < #(x:xs) ∧ 0 <= j < #(y:ys) : (x:xs).i - (y:ys).j = 0>
+    [DEF CARDINAL]
+<∀i, j : 0 <= i < 1+#xs ∧ 0 <= j < 1+#ys : (x:xs).i - (y:ys).j = 0>
+    [LÓGICA, PARTICIÓN DE RANGO]
+<∀i, j : 0 <= i < 1 ∧ 0 <= j < 1 : (x:xs).i - (y:ys).j = 0> ∧ <∀i, j : 1 <= i < 1+#xs ∧ 1 <= j < 1+#xs : (x:xs).i - (y:ys).j = 0>
+    [RANGO UNITARIO]
+(x:xs).0 - (y:ys).0 = 0 ∧ <∀i, j : 1 <= i < 1+#xs ∧ 1 <= j < 1+#xs : (x:xs).i - (y:ys).j = 0>
+    [i <- i+1, j <- j+1, ARITMETICA, DEF POSICIÓN]
+x - y = 0 ∧ <∀i, j : 0 <= i < #xs ∧ 0 <= j < #xs : xs.i - ys.j = 0>
+    [HI]
+x - y = 0 ∧ f.xs.ys
+
+f.[].ys = True
+f.(x:xs).[] = True
+f.(x:xs).(y:ys) = x - y = 0 ∧ f.xs.ys
+
 --------------------------------------------------------------------------------------
 -- Especificar y derivar un programa imperativo que dado dos números x e y, calcule su mínimo común múltiplo.
+mcm : Int -> Int -> Int
+mcm.x.y
+    | x == y = x
+    | otherwise = x*y
+
+{True}
+if x = y -> res := x
+[] x <> y -> res := x*y
+fi
+{res = mcm.x.y}
+
+--Demostración
+[P -> (B0 v...v Bn)]
+∧ {P ∧ B0} S0 {Q}
+∧...∧ {P ∧ Bn} Sn {Q}
+
+True -> x = y v x <> y
+    [LÓGICA]
+True -> True
+    [LÓGICA]
+True
+
+{True ∧ x = y} res := x {res = mcm.x.y}
+    [DEF WP]
+True ∧ x = y -> wp.(res := x).(res = mcm.x.y)
+    [NEUTRO ∧, DEF ASIGNACIÓN WP]
+x = y -> x = mcm.x.y
+    [LEIBNITZ]
+x = y -> x = mcm.x.x
+    [DEF MCM]
+x = y -> x = x
+    [ARITMETICA]
+True
+
+{True ∧ x <> y} res := x*y {res = mcm.x.y}
+    [DEF WP]
+True ∧ x <> y -> wp.(res := x*y).(res = mcm.x.y)
+    [NEUTRO ∧, DEF ASIGNACIÓN WP]
+x <> y -> x*y = mcm.x.y
+    [DEF MCM]
+x <> y -> x*y = x*y
+    [ARITMETICA]
+True
+
+--Como se cumplen todas las conjunciones, podemos decir que se ha demostrado el if.
 
 --------------------------------------------------------------------------------------
 -- Demostrar que durante cualquier ciclo lo siguiente se cumple: 
---	    P ∧ t ≤ 0 ⇒ ¬B ≡ P ∧ B ⇒ t > 0
+--	    I ∧ t ≤ 0 ⇒ ¬B ≡ I ∧ B ⇒ t > 0
 --  Teniendo en cuenta que P es el invariante del ciclo, B es la guarda y t es el variante.
+
+I ∧ t ≤ 0 -> ¬B ≡ I ∧ B -> t > 0
+    [DEF VARIANTE(A)]
+I ∧ t ≤ 0 -> ¬B ≡ True
+    [NEUTRO ≡]
+I ∧ t ≤ 0 -> ¬B
 
 --------------------------------------------------------------------------------------
 ----------------------------------------2016C-----------------------------------------
