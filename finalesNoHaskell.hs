@@ -2,13 +2,23 @@
 -----------------------------------------2015-----------------------------------------
 --------------------------------------------------------------------------------------
 -- ¿Qué es el wp? ¿Cuáles son sus propiedades más importantes? Explicar el wp para la asignación y el if.
-El wp es la "weakest precondition", es decir, la precondición mas debil que hace valido a la postcondición. Dentro de sus propiedades más importantes nos encontramos con el skip, el := (asignación), el abort.
+El wp es la "weakest precondition", es decir, la precondición mas debil que hace valido a la postcondición.
+Dentro de ella hay 5 propiedades importantes (Son las propiedades de las ternas de Hoare) las cuales son:
+•Exclusión de milagros: {P}S{False} ≡ [P ≡ False]
+•Fortalecimiento de la precondición: {P}S{Q} ∧ [P0 -> P] -> {P0}S{Q}
+    EJ: {x=2 ∧ x=5}S{Q} -> {x=2}S{Q}
+•Debilitamiento de la postcondición: {P}S{Q} ∧ [Q -> Q0] -> {P}S{Q0}
+    EJ: {P}S{x=2} -> {P}S{x=2 v x=5}
+•Conjunción de postcondición: {P}S{Q} ∧ {P}S{Q'} ≡ {P}S{Q y Q'}
+•Disyunción de precondición: {P}S{Q} ∧ {P'}S{Q} ≡ {P v P'}S{Q}
+
 - := (ASIGNACIÓN): wp.(:=).Q
     Lo que hacemos en la asignación es reemplazar cada elemento que se asigne en la postcondición, es decir: Q(:=)
     EJ: wp.(x = x+1).(2x) = 2(x+1)
 
 - if: wp.if.q
-    VERLO, NO ME ACUERDO
+    Lo que comprobamos es [(B0 v...v Bn) ∧ (B0 -> wp.S0.Q) ∧...∧ (Bn -> wp.Sn.Q)
+    El wp del if requiere minimamente que alguna de las guardas sea verdadera y que cada una de ellas sea mas fuerte que la precondición más debil respecto a S.
 
 --------------------------------------------------------------------------------------
 -- Especificar y derivar una función f : [Num] -> Bool, tal que devuelve true cuando siempre que aparece un 0 aparece un 1 en alguna posición posterior, además la cantidad de 0’s y 1’s es la misma. Puede suponer que solo aparecen 0’s o 1’s.
@@ -117,7 +127,7 @@ do (j <= i)
     [] (mod i j != 0) -> j := j+1
     fi
 od
-{Q: res >= 2}
+{Q: res >= <Σi : 0 <= i < #xs ∧ mod x i == 0 ∧ i <> 0 : 1>}
 {I: i > 0 ∧ j <= i ∧ res >= 0}
 
 -- Inicialización: {P}S{I}
@@ -132,9 +142,9 @@ i > 0 ->  i >= 1
 True
 
 -- Postcondición: I ∧ -B0 ∧...∧ -Bn -> Q
-(i > 0 ∧ j <= i ∧ res >= 0) ∧ (j > i) -> res >= 2
+(i > 0 ∧ j <= i ∧ res >= 0) ∧ (j > i) -> res >= <Σi : 0 <= i < #xs ∧ mod x i == 0 ∧ i <> 0 : 1>
     [ASOCIATIVA Y CONMUTATIVA ∧, LÓGICA]
-res >= 0 -> res >= 2
+res >= 0 -> res >= <Σi : 0 <= i < #xs ∧ mod x i == 0 ∧ i <> 0 : 1>
     [LEIBNITZ]
 True
 
@@ -587,10 +597,18 @@ True
 --  Teniendo en cuenta que P es el invariante del ciclo, B es la guarda y t es el variante.
 
 I ∧ t ≤ 0 -> ¬B ≡ I ∧ B -> t > 0
-    [DEF VARIANTE(A)]
-I ∧ t ≤ 0 -> ¬B ≡ True
-    [NEUTRO ≡]
-I ∧ t ≤ 0 -> ¬B
+    [A -> B ≡ -A v B]
+-(I ∧ t ≤ 0) v -B
+    [DE MORGAN]
+-I v -t ≤ 0 v -B
+    [DEF -]
+-I v t > 0 v -B
+    [ASOCIATIVA Y CONMUTATIVA v]
+(-I v -B) v t > 0
+    [DE MORGAN]
+-(I ∧ B) v t > 0
+    [A -> B ≡ -A v B]
+I ∧ B -> t > 0
 
 --------------------------------------------------------------------------------------
 ----------------------------------------2016C-----------------------------------------
@@ -600,20 +618,113 @@ I ∧ t ≤ 0 -> ¬B
 --	    •B dice: A y yo somos de diferente tipo
 --  ¿Qué puede deducir utilizando el cálculo proposicional dado en la materia?
 
---------------------------------------------------------------------------------------
--- Especificar y derivar una función imperativa que calcule el mínimo común múltiplo entre dos números positivos dados.
+B ≡ (-A ∧ B) v (A ∧ -B)
+    [REGLA DORADA]
+B ≡ (-A ≡ B ≡ -A v B) v (A ∧ -B)
+    [NEUTRO v]
+B ≡ (-A ≡ B v False ≡ -A v B) v (A ∧ -B)
+    [(A v B) ≡ (A v C) ≡ A v (B ≡ C)]
+B ≡ (-A ≡ B v (False ≡ -A)) v (A ∧ -B)
+    [CONTRAPOSITIVA]
+B ≡ (-A ≡ B v A) v (A ∧ -B)
+    [REGLA DORADA]
+B ≡ (-A ≡ B v A) v (A ≡ B ≡ A v -B)
+    [NEUTRO v, CONMUTATIVA ≡]
+B ≡ (-A ≡ B v A) v (B ≡ A v False ≡ A v -B)
+    [(A v B) ≡ (A v C) ≡ A v (B ≡ C)]
+B ≡ (-A ≡ B v A) v (B ≡ A v (False ≡ -B))
+    [CONTRAPOSITIVA]
+B ≡ (-A ≡ B v A) v (B ≡ A v B)
+    [NEUTRO v]
+B ≡ (-A ≡ B v A) v (False v B ≡ A v B)
+    [(A v B) ≡ (A v C) ≡ A v (B ≡ C)]
+B ≡ (-A ≡ B v A) v (B v (False ≡ A))
+    [CONTRAPOSITIVA]
+B ≡ (-A ≡ B v A) v B v -A
+    [REGLA DORADA]
+B ≡ (-A ≡ A ≡ B ≡ A ∧ B) v B v -A
+    [NEUTRO ≡]
+B ≡ (B ≡ A ∧ B) v B v -A
+    [REGLA DORADA]
+B ≡ (A ≡ A v B) v B v -A
+    [NEUTRO v]
+B ≡ (A v False ≡ A v B) v B v -A
+
+B ≡ (A v (False ≡ B)) v B v -A
+    [CONTRAPOSITIVA]
+B ≡ A v -B v B v -A
+    [CONMUTATIVA, ASOCIATIVA v]
+B ≡ (A v -A) v (B v -B)
+    [TERCERO EXCLUIDO]
+B ≡ True v True
+    [LÓGICA]
+B ≡ True
+    [NEUTRO ≡]
+B
+
+--Esto quiere decir que B es caballero, como son distintos entonces A es mentiroso.
 
 --------------------------------------------------------------------------------------
 -- Especificar y derivar una función recursiva f : [Nat] -> Bool, que diga si hay elementos repetidos en la lista o no.
+--Lo tomo como: True si hay elementos repetidos, False si no hay repetidos.
 
---------------------------------------------------------------------------------------
--- Definir el tipo de árboles binarios en Haskell, definir una función que cuente la cantidad de hojas que tiene un árbol.
+f : [Nat] -> Bool
+f.xs = <∃i : 0 <= i < #xs : not (sinRep.xs.i)>
+
+sinRep.xs.i = <∀j : 0 <= i : xs.j <> i>
+--Devuelve True si hasta i no hay repetidos
+
+--CB = []
+f.[] 
+    [ESPECIFICACIÓN]
+<∃i,j : 0 <= i < #[] ∧ 0 <= j < #[] : [].i == [].j>
+    [DEF CARDINAL]
+<∃i,j : 0 <= i < 0 ∧ 0 <= j < 0 : [].i == [].j>
+    [RANGO VACIO]
+False
+
+--CI = x:xs
+--HI f.xs = <∃i,j : 0 <= i < #xs ∧ 0 <= j < #xs : xs.i == xs.j>
+f.(x:xs)
+    [ESPECIFICACIÓN]
+<∃i,j : 0 <= i < #(x:xs) ∧ 0 <= j < #(x:xs) : (x:xs).i == (x:xs).j>
+    [DEF CARDINAL]
+<∃i,j : 0 <= i < 1+#xs ∧ 0 <= j < 1+#xs : (x:xs).i == (x:xs).j>
+    [LÓGICA, PARTICIÓN DE RANGO]
+<∃i,j : 0 <= i < 1 ∧ 0 <= j < 1 : (x:xs).i == (x:xs).j> v <∃i,j : 1 <= i < 1+#xs ∧ 1 <= j < 1+#xs : (x:xs).i == (x:xs).j>
+    [RANGO UNITARIO]
+(x:xs).0 == (x:xs).0 v <∃i,j : 1 <= i < 1+#xs ∧ 1 <= j < 1+#xs : (x:xs).i == (x:xs).j>
+    [DEF POSICIÓN]
+x == x v <∃i,j : 1 <= i < 1+#xs ∧ 1 <= j < 1+#xs : (x:xs).i == (x:xs).j>
+    [LÓGICA]
+True v <∃i,j : 1 <= i < 1+#xs ∧ 1 <= j < 1+#xs : (x:xs).i == (x:xs).j>
 
 --------------------------------------------------------------------------------------
 -- Responder las siguientes preguntas:
 --	    •Algún programa cumple: {false}S{true}, justifique su respuesta.
 --	    •Algún programa cumple: {true}S{false}, justifique su respuesta.
 --	    •¿Cuál es la diferencia entre corrección total y parcial? De un ejemplo.
+
+{false}S{true}
+    [DEF WP]
+False -> wp.S.True
+    [wp.S.True == True, LÓGICA]
+False -> True
+    [LÓGICA]
+True
+-- Todo programa existente cumple con ello ya que False -> True siempre es True
+
+{true}S{false}
+    [DEF WP]
+True -> wp.S.False
+    [wp.S.False == False, LÓGICA]
+True -> False
+    [LÓGICA]
+False
+--Nunca se cumple esto sin importar que valor pongamos en la precondición.
+
+¿Cuál es la diferencia entre corrección total y parcial?
+En una corrección parcial demostramos que el programa es correcto viendo la inicialización, la postcondición y el invariante mientras que en la corrección total, ademas de ver estos 3 mencionados anteriormente, tambien comprobamos que se salga/se termine el ciclado viendo el variante(a) y variante(b)
 
 --------------------------------------------------------------------------------------
 ----------------------------------------2016D-----------------------------------------
@@ -629,10 +740,7 @@ I ∧ t ≤ 0 -> ¬B
 -- Especificar y derivar un algoritmo imperativo que, dado un arreglo de enteros, calcule la longitud de la mayor subsecuencia cuyos elementos son todos 0.
 
 --------------------------------------------------------------------------------------
--- ¿Qué son las expresiones canónicas? Explicar cuáles son las expresiones canónicas de los tipos básicos y estructurados de Haskell. ¿Qué son las formas normales? 
-
---------------------------------------------------------------------------------------
---  Dar ejemplos de expresiones que no tienen forma normal.
+-- ¿Qué son las expresiones canónicas? Explicar cuáles son las expresiones canónicas de los tipos básicos y estructurados de Haskell. ¿Qué son las formas normales? Dar ejemplos de expresiones que no tienen forma normal.
 
 --------------------------------------------------------------------------------------
 ----------------------------------------2016E-----------------------------------------
@@ -675,9 +783,6 @@ I ∧ t ≤ 0 -> ¬B
 --------------------------------------------------------------------------------------
 ----------------------------------------2018A-----------------------------------------
 --------------------------------------------------------------------------------------
--- ¿Cuáles son las principales propiedades de las funciones? De un ejemplo de como se pueden utilizar estas propiedades.
-
---------------------------------------------------------------------------------------
 -- Especificar y derivar una función imperativa que calcule Fibonacci.
 
 --------------------------------------------------------------------------------------
@@ -705,9 +810,6 @@ I ∧ t ≤ 0 -> ¬B
 -- Especificar y derivar una función f : [Num] -> Num, tal que devuelve la suma del subsegmento de suma mínima de una secuencia de números enteros.
 
 --------------------------------------------------------------------------------------
--- Especificar y derivar un programa imperativo que calcule la función Fibonacci.
-
---------------------------------------------------------------------------------------
 -- Sea ⊕ donde ⊕ es una operación asociativa y conmutativa, probar la siguiente regla de cuantificadores:
 --	    <⊕i, j : i = Z ∧ R.i.j : T.i.j> ≡ <⊕j : R.Z.j : T.Z.j>
 
@@ -718,23 +820,8 @@ I ∧ t ≤ 0 -> ¬B
 --------------------------------------------------------------------------------------
 -----------------------------------------2019-----------------------------------------
 --------------------------------------------------------------------------------------
--- En la isla de mentirosos y caballeros se encuentran en el siguiente escenario:
---	    •A dice: B y yo somos del mismo tipo
---	    •B dice: A y yo somos de diferente tipo
---  ¿Qué puede deducir utilizando el cálculo proposicional dado en la materia?
-
---------------------------------------------------------------------------------------
--- Demostrar la siguiente propiedad:
---	    <Min i : R.i : -E.i> = - <Max i : R.i : F.i>
-
---------------------------------------------------------------------------------------
 -- Especifique y derive una función recursiva que diga si, dada una secuencia de xs, existe una subsecuencia no vacía con suma 0.
 
 --------------------------------------------------------------------------------------
 -- Demostrar o refutar la siguiente propiedad:
 --	    wp.S.P v Q ≡ wp.S.P v wp.S.Q
-
---------------------------------------------------------------------------------------
--- Demostrar que durante cualquier ciclo lo siguiente se cumple: 
---	    P ∧ t ≤ 0 ⇒ ¬B ≡ P ∧ B ⇒ t > 0
---  Teniendo en cuenta que P es el invariante del ciclo, B es la guarda y t es el variante.
