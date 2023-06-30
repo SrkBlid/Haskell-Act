@@ -669,35 +669,113 @@ B
 --Lo tomo como: True si hay elementos repetidos, False si no hay repetidos.
 
 f : [Nat] -> Bool
-f.xs = <∃i : 0 <= i < #xs : not (sinRep.xs.i)>
+f.xs = <∃i : 0 <= i < #xs : <∃j : 0 <= j < #xs : xs.i == xs.j>>
 
-sinRep.xs.i = <∀j : 0 <= i : xs.j <> i>
---Devuelve True si hasta i no hay repetidos
-
---CB = []
-f.[] 
+--CB []
+f.[]
     [ESPECIFICACIÓN]
-<∃i,j : 0 <= i < #[] ∧ 0 <= j < #[] : [].i == [].j>
+<∃i : 0 <= i < #[] : <∃j : 0 <= j < #[] : [].i == [].j>>
     [DEF CARDINAL]
-<∃i,j : 0 <= i < 0 ∧ 0 <= j < 0 : [].i == [].j>
+<∃i : 0 <= i < 0 : <∃j : 0 <= j < 0: [].i == [].j>>
     [RANGO VACIO]
 False
 
---CI = x:xs
---HI f.xs = <∃i,j : 0 <= i < #xs ∧ 0 <= j < #xs : xs.i == xs.j>
+--CI x:xs
+--HI f.xs = <∃i : 0 <= i < #xs : <∃j : 0 <= j < #xs : xs.i == xs.j>>
 f.(x:xs)
     [ESPECIFICACIÓN]
-<∃i,j : 0 <= i < #(x:xs) ∧ 0 <= j < #(x:xs) : (x:xs).i == (x:xs).j>
+<∃i : 0 <= i < #(x:xs) : <∃j : 0 <= j < #(x:xs) : (x:xs).i == (x:xs).j>>
     [DEF CARDINAL]
-<∃i,j : 0 <= i < 1+#xs ∧ 0 <= j < 1+#xs : (x:xs).i == (x:xs).j>
+<∃i : 0 <= i < 1+#xs : <∃j : 0 <= j < 1+#xs : (x:xs).i == (x:xs).j>>
     [LÓGICA, PARTICIÓN DE RANGO]
-<∃i,j : 0 <= i < 1 ∧ 0 <= j < 1 : (x:xs).i == (x:xs).j> v <∃i,j : 1 <= i < 1+#xs ∧ 1 <= j < 1+#xs : (x:xs).i == (x:xs).j>
-    [RANGO UNITARIO]
-(x:xs).0 == (x:xs).0 v <∃i,j : 1 <= i < 1+#xs ∧ 1 <= j < 1+#xs : (x:xs).i == (x:xs).j>
-    [DEF POSICIÓN]
-x == x v <∃i,j : 1 <= i < 1+#xs ∧ 1 <= j < 1+#xs : (x:xs).i == (x:xs).j>
+<∃i : 0 <= i < 1+#xs : <∃j : 0 <= j < 1 : (x:xs).i == (x:xs).j> v <∃j : 1 <= j < 1+#xs : (x:xs).i == (x:xs).j>>
+    [RANGO UNITARIO, j <- j+1, ARITMETICA, DEF POSICIÓN]
+<∃i : 0 <= i < 1+#xs : (x:xs).i == x v <∃j : 0 <= j < #xs : (x:xs).i == xs.j>>
+    [LÓGICA, PARTICIÓN DE RANGO]
+<∃i : 0 <= i < 1 : (x:xs).i == x v <∃j : 0 <= j < #xs : (x:xs).i == xs.j>> v <∃i : 1 <= i < 1+#xs : (x:xs).i == x v <∃j : 0 <= j < #xs : (x:xs).i == xs.j>>
+    [RANGO UNITARIO, i <- i+1, ARITMETICA, DEF POSICIÓN]
+x == x v <∃j : 0 <= j < #xs : x == xs.j> v <∃i : 0 <= i < #xs : xs.i == x v <∃j : 0 <= j < #xs : xs.i == xs.j>>
     [LÓGICA]
-True v <∃i,j : 1 <= i < 1+#xs ∧ 1 <= j < 1+#xs : (x:xs).i == (x:xs).j>
+True v <∃j : 0 <= j < #xs : x == xs.j> v <∃i : 0 <= i < #xs : xs.i == x v <∃j : 0 <= j < #xs : xs.i == xs.j>>
+    [LÓGICA]
+<∃j : 0 <= j < #xs : x == xs.j> v <∃i : 0 <= i < #xs : xs.i == x v <∃j : 0 <= j < #xs : xs.i == xs.j>>
+
+    [DEMOSTRAMOS]
+    h.xs.y = <∃j : 0 <= j < #xs : y == xs.j>
+
+--CB []
+h.[].y
+    [ESPECIFICACIÓN]
+<∃j : 0 <= j < #[] : y == [].j>
+    [DEF CARDINAL]
+<∃j : 0 <= j < 0 : y == [].j>
+    [RANGO VACIO]
+False
+
+--CI x:xs
+--HI h.xs.y = <∃j : 0 <= j < #xs : y == xs.j>
+h.(x:xs).y
+    [ESPECIFICACIÓN]
+<∃j : 0 <= j < #(x:xs) : y == (x:xs).j>
+    [DEF CARDINAL]
+<∃j : 0 <= j < 1+#xs : y == (x:xs).j>
+    [LÓGICA, PARTICIÓN DE RANGO]
+<∃j : 0 <= j < 1 : y == (x:xs).j> v <∃j : 1 <= j < 1+#xs : y == (x:xs).j>
+    [RANGO UNITARIO, j <- j+1, ARITMETICA, DEF POSICIÓN]
+y == x v <∃j : 0 <= j < #xs : y == xs.j>
+    [LÓGICA, HI]
+y == x v h.xs.y
+
+h.[] = False
+h.(x:xs).y = y == x v h.xs.y
+
+    [VOLVEMOS]
+
+x == x v h.xs.x v <∃i : 0 <= i < #xs : xs.i == x v <∃j : 0 <= j < #xs : xs.i == xs.j>>
+
+    [MODULARIZAMOS]
+    g.hs.n = <∃i : 0 <= i < #xs : n v <∃j : 0 <= j < #xs : xs.i == xs.j>>
+
+--CB []
+g.[].n 
+    [ESPECIFICACIÓN]
+<∃i : 0 <= i < #[] : n v <∃j : 0 <= j < #[] : xs.i == xs.j>>
+    [DEF CARDINAL]
+<∃i : 0 <= i < 0 : n v <∃j : 0 <= j < 0 : xs.i == xs.j>>
+    [RANGO VACIO]
+False
+
+--CI x:xs
+--HI g.xs.n = <∃i : 0 <= i < #xs : n v <∃j : 0 <= j < #xs : xs.i == xs.j>>
+g.(x:xs).n
+    [ESPECIFICACIÓN]
+<∃i : 0 <= i < #(x:xs) : n v <∃j : 0 <= j < #(x:xs) : (x:xs).i == (x:xs).j>>
+    [DEF CARDINAL]
+<∃i : 0 <= i < 1+#xs : n v <∃j : 0 <= j < 1+#xs : (x:xs).i == (x:xs).j>>
+    [LÓGICA, PARTICIÓN DE RANGO]
+<∃i : 0 <= i < 1+#xs : n v <∃j : 0 <= j < 1 : (x:xs).i == (x:xs).j> v <∃j : 1 <= j < 1+#xs : (x:xs).i == (x:xs).j>>
+    [RANGO UNITARIO, j <- j+1, ARITMETICA, DEF POSICIÓN]
+<∃i : 0 <= i < 1+#xs : n v (x:xs).i == x v <∃j : 0 <= j < #xs : (x:xs).i == xs.j>>
+    [LÓGICA, PARTICIÓN DE RANGO]
+<∃i : 0 <= i < 1 : n v (x:xs).i == x v <∃j : 0 <= j < #xs : (x:xs).i == xs.j>> v <∃i : 1 <= i < 1+#xs : n v (x:xs).i == x v <∃j : 0 <= j < #xs : (x:xs).i == xs.j>>
+    [RANGO UNITARIO, i <- i+1, ARITMETICA, DEF POSICIÓN]
+n v x == x v <∃j : 0 <= j < #xs : x == xs.j> v <∃i : 0 <= i < #xs : n v xs.i == x v <∃j : 0 <= j < #xs : xs.i == xs.j>>
+    [DEF H, HI]
+n v x == x v h.xs.x v g.xs.(n v xs.i == x)
+    [LÓGICA]
+n v h.xs.x v g.xs.(n v xs.i == x)
+
+g.[].n = False
+g.(x:xs).n = n v h.xs.x v g.xs.(n v xs.i == x)
+
+    [VOLVEMOS]
+
+(x == x v h.xs.x) v (xs.i == x) v (h.xs.x) v (g.xs.(xs.i == x v xs.i == x))
+    [IDEMPOTENCIA, LÓGICA]
+(xs.i == x) v (h.xs.x) v (g.xs.(xs.i == x))
+
+f.[] = False
+f.(x:xs) = (xs.i == x) v (h.xs.x) v (g.xs.(xs.i == x))
 
 --------------------------------------------------------------------------------------
 -- Responder las siguientes preguntas:
