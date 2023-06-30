@@ -1,0 +1,140 @@
+•DEMOSTRAR LÓGICA PROPOSICIONAL
+    P ≡ Q
+    Utilizando las reglas de la lógica proposicional tenemos que llegar a que se elimine el ≡, de tal manera que nos quede una fórmula nueva.
+
+•DEMOSTRAR UNA FUNCIÓN
+    f = f'
+    Dada una función, utilizando la definición de la misma, tenemos que llegar a un punto donde ambos lados de la igualdad sean lo mismo. Dando uso de la inducción.
+
+•PROGRAMA FUNCIONAL
+    •ESPECIFICAR: <⊕i : R.i : T.i>
+    (⊕ = Cuantificador, R.i = Rango que toma, T.i = Termino, operación)
+    EJ: <∃i : 0 <= i < #xs : xs.i = 5>
+    EJ (SUBSEGMENTOS): <Max as,bs,cs : xs = as++bs++cs : #bs>
+
+    •DERIVAR: <⊕i : R.i : T.i>
+    Para derivar una especificación tenemos que verlo por inducción, es decir, comprobar que son validos el caso base y el caso inductivo. Esto se tiene que hacer para la función principal y sus auxiliares para que sea válida.
+
+•PROGRAMA IMPERATIVO
+    •SACAR WP: Tenemos que tomar la precondición (P) e implicarla al wp de las sentencias (S) y la postcondición (Q).
+    EJ: {P} S {Q}
+        P -> wp.S.Q
+
+    •ESPECIFICAR: Se tiene que elaborar la precondición (P), las sentencias (S) y la postcondición (Q), de tal manera que tengamos:
+    {P} S {Q}
+    EJ: {True}
+        if not a or b -> a := not a
+        [] a or not b -> b := not b
+        {a ∨ b}
+
+    •DEMOSTRAR: Para demostrar un programa imperativo lo podemos realizar a travez de la definición de wp y llegando a un True. En el caso de que tengamos un if o un do es distinto.
+        •IF: Se tiene que cumplir 2 (o más) conjunciones segun la cantidad de if's:
+            [P -> (B0 v B1 v...v Bn)] 
+            ∧ {P ∧ B0} S0 {Q} ∧...∧ {P ∧ Bn} Sn {Q}
+
+            •wp.if.Q: Requiere minimamente que alguna de las guardas se cumpla y que cada una de ellas sea más fuerte que la precondición más débil.
+            (B0 v B1 v...v Bn) ∧ (B0 -> wp.S0.Q) ∧...∧ (Bn -> wp.Sn.Q)
+
+        •DO: Para derivar un do usamos el "Teorema del Do" el cual se tienen que cumplir 5 puntos para demostrar la validez del mismo, los cuales son:
+            •Inicialización: {P} S {I}
+            •Postcondición: (I ∧ -B0 ∧...∧ -Bn) -> Q
+            •Invariante: {I ∧ Bn} Sn {I}
+            --------------------------------------------------------------------------
+            •Variante(a): I ∧ Bn -> v >= 0
+            •Variante(b): {I ∧ Bn ∧ v = A} Sn {v < A}
+
+            Si demostramos hasta invariante tenemos lo que se llama "Corrección parcial", si demostramos los ultimos 2 puntos tenemos "Corrección total", la cual demuestra que el ciclo termina.
+            El invariante y los variantes hay que hacerlos para cada Bn.
+
+            Con esto demostramos que el ciclo es correcto.
+
+    •DESARROLLAR/DERIVAR UN CICLO(DO): Dada una precondición P y una postcondición Q, los pasos a seguir son:
+        1. Elegir el invariante I y la guarda B de manera que se satisfaga I ∧-B -> Q.
+           Esto garantiza el cumplimiento de la postcondición al finalizar el ciclo.
+        2. Inicializar, desarrollando S’ tal que {P}S’{I}.
+           Esto garantiza el cumplimiento del invariante al comenzar el ciclo.
+        3. Elegir la cota t de manera que I ∧ t <= 0 -> -B, es decir, una función cuyo 
+           decrecimiento asegure que la guarda B sea falsa en algún momento. Esto garantiza la finalización del ciclo.
+        4. Derivar S de tal manera que {I ∧ B} S {I} y {I ∧ B ∧ t = T} S {t < T}, es   
+           decir, un programa que mantenga el invariante y decrezca la función variante.
+
+•TIPO DE DATO NUEVO
+    •CREAR TIPO NUEVO: Para crear un nuevo tipo hay que usar la palabra reversada "data" y luego expresarlo. Se expresa separando los terminos/posibles resultados por la barra (|)
+    EJ: data binTree = Nil | Node (binTree a) a (binTree a)
+
+    •INSTANCIARLO: La mayoria de datos nuevos se pueden instanciar automaticamente con el diriving pero para hacerlo manualmente tenemos que dar uso de la palabra reservada "instance".
+    EJ: instance Eq Nat where
+            Zero == Zero = True
+            Zero == Succ n = False
+            Succ n == Succ m = n == m
+
+
+----------------------------------------------------------------------------------------
+---------------------------------------TEORIA-------------------------------------------
+----------------------------------------------------------------------------------------
+•Diferencia entre reducción/evaluación normal y lazy:
+    •Normal: Los argumentos se pasan sin evaluar a una función hasta que sea necesario. Esto significa que los argumentos solo son evaluados cuando son requeridos por la función durante la ejecución.
+    •Lazy: Al igual que la normal, los argumentos no se evaluan hasta que sean requeridos. Los valores se evaluan y se almacenan en memoria para su uso posterior, mejorando asi la eficiencia.
+
+•¿Se puede cambiar cambiar el orden de evaluación en Haskell? ¿Para que puede servir hacerlo? Dar ejemplo
+    Se puede cambiar temporalmente el orden de evaluación usando el operador $. Se puede utilizar para ahorrar parentesis o para composición de funciones.
+    Ejemplo: sqrt 3 + 4 + 9 -> sqrt $ 3 + 4 + 9 = sqrt(3 + 4 + 9)
+
+•Diferencia foldr y foldl:
+    •DIRECCIÓN: foldl asocia de izquierda a derecha mientras que foldr asocia de derecha a izquierda.
+    •TIPO DE PLEGADO: por su tipo de plegado, foldl tiene que analizar todos los elementos de la lista antes de plegarla, mientras que foldr solo analizara el elemento cuando le sea necesario.
+    •LISTAS INFINITAS: por su tipo de plegado, foldl no puede realizar listas infinitas ya que primero tendria que evaluar todos sus elementos y no puede, mientras que con foldr podriamos hacerlo con solo encontrar su primer elemento, de ahi pliega hasta el principio de la lista.
+    •VENTAJAS/DESVENTAJAS FOLDL Y FOLDR
+    Foldl ventajas:
+        -Puede trabajar con otros elementos ademas de listas, como con arboles.
+        -Es mas eficiente al trabajar con operaciones/funciones que asocien a la izq.
+    Foldl desventajas:
+        -No puede trabajar con listas infinitas.
+        -La visualización del foldl resulta compleja al trabajar con grandes listas.
+    Foldr ventajas:
+        -Puede trabajar con listas infinitas.
+        -Es mas eficiente al tener funciones/operaciones que son asociativas a la derecha, como cuando creamos una lista inversa.
+    Foldr desventajas:
+        -No puede trabajar afuera de listas.
+        -Es poco eficiente cuando la función requiere asociación a izquierda.
+
+•¿Que es el wp? ¿Cuales son sus propiedades más importantes?
+    El wp es la "weakest precondition", es decir, la precondición más débil que hace que la postcondición se cumpla/sea verdadera.
+    Dentro de sus propiedades más importantes nos encontramos con:
+        - skip: Es como el 0 en algebra, su utilidad es no hacer nada.
+                 wp.skip.Q = Q
+        - abort: Representa el finiquito del programa.
+                 wp.abort.Q = False
+        - := (asignación): Como su nombre lo indica, sirve para asignar valores a las variables que se encuentran en Q.
+                 wp.(x := E).Q = Q(x := E)
+        - ; (concatenación): Dada la concatenación S;T, se obtiene su wp tomando primero el wp del que se encuentra más a la derecha y se toma como Q del anterior al mismo, es decir:
+                 wp.(S;T).Q = wp.S.(wp.T.Q)
+        Para demostrar {P}S;T{Q} hay que encontrar un R que sea postcondición de S y precondición de T, tal que:
+                 {P}S{R} ∧ {R}T{Q}
+
+•¿Cuando dos programas imperativos son equivalentes?
+    S y T son iguales cuando sus wp dan lo mismo.
+    wp.S.Q == wp.T.Q
+
+•¿Cuando una función es polimorfica en Haskell?
+    En Haskell, una función es polimórfica si está definida para trabajar con cualquier tipo de datos, es decir, si puede ser invocada con argumentos de diferentes tipos.
+    EJ: id :: a -> a
+        id x = x
+
+•¿Cuando una función es estricta en Haskell?
+    En Haskell, una función se considera estricta cuando evalúa sus argumentos antes de realizar cualquier otra operación. Esto significa que los argumentos de una función estricta siempre se evalúan completamente antes de que la función comience a ejecutar su cuerpo. Esto se puede lograr con !, lo cual fuerza la evaluación.
+    EJ: add :: Int -> Int -> Int
+        add !x !y = x + y
+
+•¿Qué son las expresiones canónicas? Explicar cuáles son las expresiones canónicas de los tipos básicos y estructurados de Haskell. ¿Qué son las formas normales? Dar ejemplos de expresiones que no tienen forma normal.
+    Las expresiones canonicas son aquellas que son la maxima reducción de una expresión/fórmula.
+    EJ: 5+5, Canonica: 10
+
+    Expresiones canonicas para los tipos de Haskell:
+        -Booleanos: true, false
+        -Números: 0,1,2,3...
+        -Pares: (E0, E1) donde E0 y E1 son expresiones canonicas
+        -Listas: [E0, E1, ..., En] donde En son expresiones canonicas
+
+    Las formas normales de una expresión es la expresión canonica la cual representa el mismo valor.
+    Hay expresiones que no tienen forma normal, como: inf = inf+1
