@@ -731,54 +731,475 @@ En una corrección parcial demostramos que el programa es correcto viendo la ini
 --------------------------------------------------------------------------------------
 -- Especificar y derivar una función f : [Char] -> Bool, tal que devuelve true cuando los paréntesis que aparecen en la secuencia están balanceados (se puede considerar que la secuencia solo consta de paréntesis)
 
+f : [Char] -> Bool
+f.xs = <∀i : 0 <= i < #xs : xs.i = '(' v xs.i = ')'>
+
+--CB []
+f.[]
+    [ESPECIFICACIÓN]
+<∀i : 0 <= i < #[] : [].i = '(' v [].i = ')'>
+    [DEF CARDINAL]
+<∀i : 0 <= i < 0 : [].i = '(' v [].i = ')'>
+    [RANGO VACIO]
+True
+
+--CI x:xs
+--HI f.xs = <∀i : 0 <= i < #xs : xs.i = '(' v xs.i = ')'>
+f.(x:xs)
+    [ESPECIFICACIÓN]
+<∀i : 0 <= i < #(x:xs) : (x:xs).i = '(' v (x:xs).i = ')'>
+    [DEF CARDINAL]
+<∀i : 0 <= i < 1+#xs : (x:xs).i = '(' v (x:xs).i = ')'>
+    [LÓGICA, PARTICIÓN DE RANGO]
+<∀i : 0 <= i < 1 : (x:xs).i = '(' v (x:xs).i = ')'> ∧ <∀i : 1 <= i < 1+#xs : (x:xs).i = '(' v (x:xs).i = ')'>
+    [RANGO UNITARIO]
+(x:xs).0 = '(' v (x:xs).0 = ')' ∧ <∀i : 1 <= i < 1+#xs : (x:xs).i = '(' v (x:xs).i = ')'>
+    [DEF POSICIÓN, i <- i+1, ARITMETICA]
+x = '(' v x = ')' ∧ <∀i : 0 <= i < #xs : xs.i = '(' v xs.i = ')'>
+    [HI]
+x = '(' v x = ')' ∧ f.xs
+
 --------------------------------------------------------------------------------------
 -- Demostrar por inducción que:
 --	    #α(S) = 2^(#S)
 -- Donde S es un conjunto finito y #S es la cantidad de elementos de S.
 
+
 --------------------------------------------------------------------------------------
 -- Especificar y derivar un algoritmo imperativo que, dado un arreglo de enteros, calcule la longitud de la mayor subsecuencia cuyos elementos son todos 0.
 
+a : array [0, N) of Int
+i, r, m := 0, 0, 0;
+{N > 0}
+do i < N
+    if a.i = 0 -> r, i := r+1, i+1;
+    [] a.i /= 0 -> r, i, m := 0, i+1, r;
+    fi
+od
+{m = <Max as,bs,cs : a.i = as++bs++cs ∧ bs.i = 0 : #bs>}
+{I = N-i > 0}
+{v}
+
+--DEMOSTRACIONES
+--Inicialización: {P}S{I}
+{N > 0} i, r, m := 0, 0, 0 {N-i > 0}
+    [DEF WP]
+N > 0 -> wp.(i, r, m := 0, 0, 0).(N-i > 0)
+    [DEF ASIGNACIÓN WP]
+N > 0 -> N-0 > 0
+    [ARITMETICA]
+N > 0 -> N > 0
+    [LEIBNITZ]
+True
+
+--Postcondición: (I ∧ -Bn) -> Q
+N-i > 0 ∧ a.i = 0 ∧ a.i /= 0 -> m = <Max as,bs,cs : a.i = as++bs++cs ∧ bs.i = 0 : #bs>
+    [ARITMETICA, LÓGICA]
+N > i ∧ False -> m = <Max as,bs,cs : a.i = as++bs++cs ∧ bs.i = 0 : #bs>
+    [LÓGICA]
+False -> m = <Max as,bs,cs : a.i = as++bs++cs ∧ bs.i = 0 : #bs>
+    [LÓGICA ->]
+True
+
+--Invariante: {I ∧ Bn} Sn {I}
+{N-i > 0 ∧ a.i = 0} r, i := r+1, i+1 {N-i > 0}
+    [DEF WP]
+N-i > 0 ∧ a.i = 0 -> wp.(r, i := r+1, i+1).(N-i > 0)
+    [DEF ASIGNACIÓN WP]
+N-i > 0 ∧ a.i = 0 -> N-i+1 > 0
+    [LEIBNITZ, LÓGICA (Si a > 0 entonces a+1 > 0)]
+True
+
+{N-i > 0 ∧ a.i /= 0} r, i, m := 0, i+1, r {N-i > 0}
+    [DEF WP]
+N-i > 0 ∧ a.i /= 0 -> wp.(r, i, m := 0, i+1, r).(N-i > 0)
+    [DEF ASIGNACIÓN WP]
+N-i > 0 ∧ a.i /= 0 -> N-i+1 > 0
+    [LEIBNITZ, LÓGICA (Si a > 0 entonces a+1 > 0)]
+True
+
+--Variante(a): I ∧ Bn -> v >= 0
+
+--Variante(b): {I ∧ Bn ∧ v = A} Sn {v < A}
+
 --------------------------------------------------------------------------------------
 -- ¿Qué son las expresiones canónicas? Explicar cuáles son las expresiones canónicas de los tipos básicos y estructurados de Haskell. ¿Qué son las formas normales? Dar ejemplos de expresiones que no tienen forma normal.
+
+Las expresiones canonicas son aquellas que son la maxima reducción de una expresión/fórmula.
+EJ: 5+5, Canonica: 10
+
+Expresiones canonicas para los tipos de Haskell:
+-Booleanos: true, false
+-Números: 0,1,2,3...
+-Pares: (E0, E1) donde E0 y E1 son expresiones canonicas
+-Listas: [E0, E1, ..., En] donde En son expresiones canonicas
+
+Las formas normales de una expresión es la expresión canonica la cual representa el mismo valor.
+Hay expresiones que no tienen forma normal, como: inf = inf+1
 
 --------------------------------------------------------------------------------------
 ----------------------------------------2016E-----------------------------------------
 --------------------------------------------------------------------------------------
 -- Explicar las diferencias entre evaluación lazy y evaluación normal, ilustrar con ejemplos. ¿Cuál es la forma de evaluación de Haskell?¿Se puede cambiar la forma de evaluación en Haskell? Dar ejemplos.
+-Normal: Los argumentos se pasan sin evaluar a una función hasta que sea necesario. Esto significa que los argumentos solo son evaluados cuando son requeridos por la función durante la ejecución.
+-Lazy: Al igual que la normal, los argumentos no se evaluan hasta que sean requeridos. Los valores se evaluan y se almacenan en memoria para su uso posterior, mejorando asi la eficiencia.
+
+La forma de evaluación de Haskell es la Lazy, no se puede cambiar la forma de evaluación de Haskell pero se puede hacer que alguna funciones tomen prioridad en unas variables sobre otras con el operador ($), se puede utilizar para ahorrar parentesis o para composición de funciones.
+EJ: sqrt 3 + 4 + 9 -> sqrt $ 3 + 4 + 9 = sqrt(3 + 4 + 9)
 
 --------------------------------------------------------------------------------------
 -- Dar definiciones de los siguientes conceptos: expresión, tipo básico, forma normal, valores, expresión canónica. Utilizar ejemplos para ilustrar sus definiciones.
+-Expresión: Una expresión es un valor el cual tiene un significado lógica o matematico, que generalmente se usa en funciones.
+EJ: f.x = E
+-Tipo básico: Un tipo básico es aquel que viene ya definido y no requiere de información adicional para comprenderlos o darle uso.
+EJ: Booleanos, Integrales, etc.
+-Forma normal: La forma normal de una expresión es la expresión canónica la cual representa el mismo valor.
+EJ: la forma normal de (5+5) es 10, ya que es la expresión canonica que representa a la expresión.
+-Valores: ¿¿¿??? Los valores son datos los cuales se utilizan en las funciones para inicializar tanto a las mismas cómo a las variables.
+-Expresión canónica: Es la máxima reducción posible aritmeticamente de una expresión.
+EJ: 10*2 = 20, donde 20 es la expresión canonica.
 
 --------------------------------------------------------------------------------------
 -- Especifique y derive una función que dada una lista de naturales retorne true si y solo si la lista es capicúa.
 
+f : [Nat] -> True
+f.xs = <∀i : 0 <= i < #xs : xs.i = xs.(#xs-i-1)>
+
+--CB = []
+f.[]
+    [ESPECIFICACIÓN]
+<∀i : 0 <= i < #[] : [].i = [].(#xs-i-1)>
+    [DEF CARDINAL]
+<∀i : 0 <= i < 0 : [].i = [].(#xs-i-1)>
+    [RANGO VACIO]
+True
+
+--CI = x:xs
+--HI f.xs = <∀i : 0 <= i < #xs : xs.i = xs.(#xs-i-1)>
+f.(x:xs)
+    [ESPECIFICACIÓN]
+<∀i : 0 <= i < #(x:xs) : (x:xs).i = (x:xs).(#(x:xs)-i-1)> 
+    [DEF CARDINAL]
+<∀i : 0 <= i < 1+#xs : (x:xs).i = (x:xs).(#(x:xs)-i-1)>
+    [LÓGICA, PARTICIÓN DE RANGO]
+<∀i : 0 <= i < 1 : (x:xs).i = (x:xs).(#(x:xs)-i-1)> ∧ <∀i : 1 <= i < 1+#xs : (x:xs).i = (x:xs).(#(x:xs)-i-1)>
+    [RANGO UNITARIO]
+(x:xs).0 = (x:xs).(#(x:xs)-0-1) ∧ <∀i : 1 <= i < 1+#xs :(x:xs).i = (x:xs).(#(x:xs)-i-1)>
+    [i <- i+1, DEF POSICIÓN, ARITMETICA]
+x = (x:xs).#xs ∧ <∀i : 0 <= i < #xs : xs.i = (x:xs).(1+#xs-i)>
+
+    [MODULARIZAMOS]
+g.xs.ys.j = <∀i : 0 <= i < #xs : xs.i = ys.(j+#xs-i)>
+
+--CB []
+g.[].ys.j 
+    [ESPECIFICACIÓN]
+<∀i : 0 <= i < #[] : [].i = (x:[]).(1+#[]-i)>
+    [DEF CARDINAL]
+<∀i : 0 <= i < 0 : [].i = (x:[]).(1+0-i)>
+    [RANGO VACIO]
+True
+
+--CI x:xs
+--HI g.xs.ys.j = <∀i : 0 <= i < #xs : xs.i = ys.j>
+g.(x:xs).ys.j
+    [ESPECIFICACIÓN]
+<∀i : 0 <= i < #(x:xs) : (x:xs).i = (x:(x:xs)).(1+#(x:xs)-i)>
+    [DEF CARDINAL, ARITMETICA]
+<∀i : 0 <= i < 1+#xs : (x:xs).i = (x:(x:xs)).(2+#xs-i)>
+    [LÓGICA, PARTICIÓN DE RANGO]
+<∀i : 0 <= i < 1 : (x:xs).i = (x:(x:xs)).(2+#xs-i)> ∧ <∀i : 1 <= i < 1+#xs : (x:xs).i = (x:(x:xs)).(2+#xs-i)>
+    [RANGO UNITARIO]
+(x:xs).0 = (x:(x:xs)).(2+#xs-0) ∧ <∀i: 1 <= i < 1+#xs : (x:xs).i = (x:(x:xs)).(2+#xs-i)>
+    [DEF POSICIÓN, i <- i+1, ARITMETICA]
+x = (x:(x:xs)).(2+#xs) ∧ <∀i : 0 <= i < #xs : xs.i = (x:(x:xs)).(1+#xs-i)>
+    [HI]
+x = (x:(x:xs)).(2+#xs) ∧ g.xs.(x:(x:xs)).1
+
+--PARA COMPLETAR TENEMOS
+f.[] = True
+f.(x:xs) = x == (x:(x:xs)).(2+#xs) ∧ g.xs.(x:(x:xs)).1
+
 --------------------------------------------------------------------------------------
 -- Especificar y derivar la siguiente función: Dada una lista de números naturales, la función P dice si hay algún elemento de la lista que es igual a la suma de los anteriores.
+
+p : [Nat] -> Bool
+p.xs = <∃i : 0 <= i < #xs : xs.i = <Σj : 0 <= j < i : xs.j>> 
+
+--CB p = []
+p.[]
+    [ESPECIFICACIÓN]
+<∃i : 0 <= i < #[] : [].i = <Σj : 0 <= j < i : [].j>> 
+    [DEF CARDINAL]
+<∃i : 0 <= i < 0 : [].i = <Σj : 0 <= j < i : [].j>> 
+    [RANGO VACIO]
+False
+
+--CI p = x:xs
+--HI p.xs = <∃i : 0 <= i < #xs : xs.i = <Σj : 0 <= j < i : xs.j>> 
+p.(x:xs) 
+    [ESPECIFICACIÓN]
+<∃i : 0 <= i < #(x:xs) : (x:xs).i = <Σj : 0 <= j < i : (x:xs).j>> 
+    [DEF CARDINAL]
+<∃i : 0 <= i < 1+#xs : (x:xs).i = <Σj : 0 <= j < i : (x:xs).j>> 
+    [LÓGICA, PARTICIÓN DE RANGO]
+<∃i : 0 <= i < 1 : (x:xs).i = <Σj : 0 <= j < i : (x:xs).j>> v <∃i : 1 <= i < 1+#xs : (x:xs).i = <Σj : 0 <= j < i : (x:xs).j>>
+    [RANGO UNITARIO, DEF POSICIÓN, RANGO VACIO]
+x = 0 v <∃i : 1 <= i < 1+#xs : (x:xs).i = <Σj : 0 <= j < i : (x:xs).j>>
+    [i <- i+1, ARITMETICA, DEF POSICIÓN]
+x = 0 v <∃i : 0 <= i < #xs : xs.i = <Σj : 0 <= j < i+1 : (x:xs).j>>
+
+    [GENERALIZAMOS]
+
+g.xs.ys.k = <∃i : 0 <= i < #xs : xs.i = <Σj : 0 <= j < i+k : ys.j>>
+
+--CB []
+g.[].ys.k
+    [ESPECIFICACIÓN]
+<∃i : 0 <= i < #[] : [].i = <Σj : 0 <= j < i+1 : (x:[]).j>>
+    [DEF CARDINAL]
+<∃i : 0 <= i < 0 : [].i = <Σj : 0 <= j < i+1 : (x:[]).j>>
+    [RANGO VACIO]
+True
+
+--CI x:xs
+--HI g.xs.ys.k = <∃i : 0 <= i < #xs : xs.i = <Σj : 0 <= j < i+k : ys.j>>
+g.(x:xs).ys.k
+    [ESPECIFICACIÓN]
+<∃i : 0 <= i < #(x:xs) : (x:xs).i = <Σj : 0 <= j < i+1 : (x:(x:xs)).j>>
+    [DEF CARDINAL]
+<∃i : 0 <= i < 1+#xs : (x:xs).i = <Σj : 0 <= j < i+1 : (x:(x:xs)).j>>
+    [LÓGICA, PARTICIÓN DE RANGO]
+<∃i : 0 <= i < 1 : (x:xs).i = <Σj : 0 <= j < i+1 : (x:(x:xs)).j>> v <∃i : 1 <= i < 1+#xs : (x:xs).i = <Σj : 0 <= j < i+1 : (x:(x:xs)).j>>
+    [RANGO UNITARIO]
+x = <Σj : 0 <= j < 1 : (x:(x:xs)).j> v <∃i : 1 <= i < 1+#xs : (x:xs).i = <Σj : 0 <= j < i+1 : (x:(x:xs)).j>>
+    [RANGO UNITARIO]
+x = x v <∃i : 1 <= i < 1+#xs : (x:xs).i = <Σj : 0 <= j < i+1 : (x:(x:xs)).j>>
+    [LÓGICA, i <- i+1, ARITMETICA, DEF POSICIÓN]
+True v <∃i : 0 <= i < #xs : xs.i = <Σj : 0 <= j < i+2 : (x:(x:xs)).j>>
+    [HI]
+True v g.xs.(x:(x:xs)).2
+
+--PARA COMPLETAR
+f.[] = True
+f.(x:xs) = True v g.xs.(x:(x:xs)).2
 
 --------------------------------------------------------------------------------------
 -- Dado un arreglo de enteros, especifique y derive un programa imperativo que devuelva en una variable x el mayor elemento del arreglo.
 
---------------------------------------------------------------------------------------
--- Demostrar que durante cualquier ciclo lo siguiente se cumple:
---	    P ∧ t ≤ 0 ⇒ ¬B ≡ P ∧ B ⇒ t > 0
---  Teniendo en cuenta que P es el invariante del ciclo, B es la guarda y t es el variante.
+a : array [0, N) of Int
+i, x := 0, 0;
+{N > 0}
+do i < N
+    if a.i > x -> x, i := a.i, i+1
+    [] a.i <= x -> i := i+1
+    fi
+od
+{x = <Max i : 0 <= i < #a : a.i> ∧ i = N>}
+{I: x = <Max i : 0 <= i < #a : a.i> ∧ i = k> ∧ 0 <= k < N ∧ N-i > 0}
+{v: N-i}
+
+--Inicialización: {P}S{I}
+{N > 0} i, x := 0, 0 {x = <Max i : 0 <= i < #a : a.i> ∧ i = k> ∧ 0 <= k < N ∧ N-i > 0}
+    [DEF WP]
+N > 0 -> wp.(i, x := 0, 0).(x = <Max i : 0 <= i < #a : a.i> ∧ i = k> ∧ 0 <= k < N ∧ N-i > 0)
+    [DEF ASIGNACIÓN WP]
+N > 0 -> 0 = <Max i : 0 <= 0 < #a : a.0> ∧ 0 = k> ∧ 0 <= k < N ∧ N-0 > 0
+    [RANGO VACIO, ARITMETICA]
+N > 0 -> 0 = 0 ∧ 0 <= k < N ∧ N > 0
+    [LEIBNITZ, LÓGICA]
+N > 0 -> True ∧ True ∧ True
+    [NEUTRO ∧, LEIBNITZ]
+True
+
+--Postcondición: I ∧ -B0 ∧...∧ -Bn -> Q
+x = <Max i : 0 <= i < #a : a.i> ∧ i = k> ∧ 0 <= k < N ∧ N-i > 0 ∧ a.i < ∧ x a.i => x -> x = <Max i : 0 <= i < #a : a.i> ∧ i = N>
+    [LÓGICA, k = N por reemplazo de constante por variables]
+x = <Max i : 0 <= i < #a : a.i> ∧ i = N> ∧ N-i > 0 ∧ True -> x = <Max i : 0 <= i < #a : a.i> ∧ i = N>
+    [NEUTRO ∧]
+x = <Max i : 0 <= i < #a : a.i> ∧ i = N> ∧ N-i > 0 -> x = <Max i : 0 <= i < #a : a.i> ∧ i = N>
+    [LEIBNITZ]
+True
+
+--Invariante: {I ∧ Bn} Sn {I}
+{x = <Max i : 0 <= i < #a : a.i> ∧ i = k> ∧ 0 <= k < N ∧ N-i > 0 ∧ a.i > x} x -> x, i := a.i, i+1 {x = <Max i : 0 <= i < #a : a.i> ∧ i = k> ∧ 0 <= k < N ∧ N-i > 0}
+    [DEF WP]
+x = <Max i : 0 <= i < #a : a.i> ∧ i = k> ∧ 0 <= k < N ∧ N-i > 0 ∧ a.i > x -> wp.(x -> x, i := a.i, i+1).(x = <Max i : 0 <= i < #a : a.i> ∧ i = k> ∧ 0 <= k < N ∧ N-i > 0)
+    [ASUMIMOS ANTECEDENTE PARA AHORRAR ESPACIO, DEF ASIGNACIÓN WP]
+a.i = <Max i : 0 <= i+1 < #a : a.(i+1)> ∧ i+1 = k> ∧ 0 <= k < N ∧ N-i+1 > 0
+    [LÓGICA (Si a > 0 entonces a+1 > 0)]
+a.i = <Max i : 0 <= i+1 < #a : a.(i+1)> ∧ i+1 = k> ∧ 0 <= k < N ∧ True
+    [NEUTRO ∧]
+a.i = <Max i : 0 <= i+1 < #a : a.(i+1)> ∧ i+1 = k> ∧ 0 <= k < N
+
+--Variante(a): I ∧ Bn -> v >= 0
+
+--Variante(b): {I ∧ Bn ∧ v = A} Sn {v < A}
 
 --------------------------------------------------------------------------------------
 ----------------------------------------2016F-----------------------------------------
 --------------------------------------------------------------------------------------
 -- Especificar y derivar una función f : [Num] -> Num que devuelve la longitud de la subsecuencia más larga cuyos elementos son todos iguales.
 
+f : [Num] -> Num
+f.xs = <Max as,bs,cs : xs = as++bs++cs ∧ elemI.bs : #bs>
+
+elemI : [Num] -> Bool
+elemI.xs = <∀i : 0 <= i < #xs-1 : xs.i = xs.(i+1)>
+
+--DEMOSTRACION elemI
+--CB elemI []
+elemI.[]
+    [ESPECIFICACIÓN]
+<∀i : 0 <= i < #[]-1 : [].i = [].(i+1)>
+    [DEF CARDINAL]
+<∀i : 0 <= i < 0-1 : [].i = [].(i+1)>
+    [RANGO VACIO]
+True
+
+--CI elemI x:xs
+--HI elemI.xs = <∀i : 0 <= i < #xs-1 : xs.i = xs.(i+1)>
+elemI.(x:xs)
+    [ESPECIFICACIÓN]
+<∀i : 0 <= i < #(x:xs)-1 : (x:xs).i = (x:xs).(i+1)>
+    [DEF CARDINAL, DEF POSICIÓN]
+<∀i : 0 <= i < #xs : (x:xs).i = xs.i>
+    
+    [MODULARIZACIÓN]
+
+g.xs = <∀i : 0 <= i < #xs : (x:xs).i = xs.i>
+--CB []
+g.[]
+    [ESPECIFICACIÓN]
+<∀i : 0 <= i < #[] : (x:[]).i = [].i>
+    [DEF CARDINAL]
+<∀i : 0 <= i < 0 : (x:[]).i = [].i>
+    [RANGO VACIO]
+True
+
+--CI x:xs
+--HI g.xs = <∀i : 0 <= i < #xs : (x:xs).i = xs.i>
+g.(x:xs)
+    [ESPECIFICAR]
+<∀i : 0 <= i < #(x:xs) : (x:(x:xs)).i = (x:xs).i>
+    [DEF CARDINAL]
+<∀i : 0 <= i < 1+#xs : (x:(x:xs)).i = (x:xs).i>
+    [LÓGICA, PARTICIÓN DE RANGO]
+<∀i : 0 <= i < 1 : (x:(x:xs)).i = (x:xs).i> ∧ <∀i : 1 <= i < 1+#xs : (x:(x:xs)).i = (x:xs).i>
+    [RANGO UNITARIO]
+(x:(x:xs)).0 = (x:xs).0 ∧ <∀i : 1 <= i < 1+#xs : (x:(x:xs)).i = (x:xs).i>
+    [i <- i+1, ARITMETICA, DEF POSICIÓN]
+x = x ∧ <∀i : 0 <= i < #xs : (x:xs).i = xs.i>
+    [HI, LÓGICA]
+True ∧ g.xs
+
+--PARA FINALIZAR
+f.[] = True
+f.(x:xs) = True ∧ g.xs
+
+--DEMOSTRACION f
+--CB f []
+f.[]
+    [ESPECIFICACIÓN]
+<Max as,bs,cs : [] = as++bs++cs ∧ elemI.bs : #bs>
+    [PROP ++]
+<Max as,bs,cs : [] = as++bs++cs ∧ as = [] ∧ bs = [] ∧ cs = [] ∧ elemI.bs : #bs>
+    [TERMINO CONSTANTE]
+#[]
+    [DEF CARDINAL]
+0
+
+--CI f x:xs
+--HI f.xs = <Max as,bs,cs : xs = as++bs++cs ∧ elemI.bs : #bs>
+f.(x:xs)
+    [ESPECIFICACIÓN]
+<Max as,bs,cs : (x:xs) = as++bs++cs ∧ elemI.bs : #bs>
+    [PARTICIÓN DE RANGO (as = [] o as /= [])]
+<Max as,bs,cs : (x:xs) = as++bs++cs ∧ as = [] ∧ elemI.bs : #bs> 
+'Max' 
+<Max as,bs,cs : (x:xs) = as++bs++cs ∧ as /= [] ∧ elemI.bs : #bs>
+    [ANIDANDO EL PRIMER TERMINO: REEMPLAZO as <- a:as EN EL SEGUNDO TERMINO (VÁLIDO POR as /= [])]
+<Max as : as = [] : <Max bs,cs : (x:xs) = as++bs++cs ∧ elemI.bs : #bs>> 
+'Max' 
+<Max a,as,bs,cs : (x:xs) = (a:as)++bs++cs ∧ (a:as) /= [] ∧ elemI.bs : #bs>
+    [RANGO UNITARIO, DEFINICIÓN ++]
+<Max bs,cs : (x:xs) = bs++cs ∧ elemI.bs : #bs>
+'Max' 
+<Max a,as,bs,cs : (x:xs) = (a:as)++bs++cs ∧ (a:as) /= [] ∧ elemI.bs : #bs>
+    [DEF ++, IGUALDAD DE LISTAS]
+<Max bs,cs : (x:xs) = bs++cs ∧ elemI.bs : #bs>
+'Max' 
+<Max a,as,bs,cs : x = a ∧ xs = as++bs++cs ∧ elemI.bs : #bs>
+    [ANIDADO, RANGO UNITARIO]
+<Max bs,cs : (x:xs) = bs++cs ∧ elemI.bs : #bs>
+'Max' 
+<Max as,bs,cs : xs = as++bs++cs ∧ elemI.bs : #bs>
+    [HI]
+<Max bs,cs : (x:xs) = bs++cs ∧ elemI.bs : #bs> 'Max' f.xs
+    
+    [INTRODUCCIÓN DE g.xs = <Max bs,cs : xs = bs++cs ∧ elemI.bs : bs>]
+
+--CB g []
+g.[]
+    [ESPECIFICAR]
+<Max bs,cs : [] = bs++cs ∧ elemI.bs : #bs>
+    [PROP ++]
+<Max bs,cs : [] = bs++cs ∧ bs = [] ∧ cs = [] ∧ elemI.bs : #bs>
+    [CONSTANTE]
+#[]
+    [DEF CARDINAL]
+0
+
+--CI g x:xs
+--HI g.xs = <Max bs,cs : xs = bs++cs ∧ elemI.bs : #bs>
+g.(x:xs)
+    [ESPECIFICACIÓN]
+<Max bs,cs : (x:xs) = bs++cs ∧ elemI.bs : #bs>
+    [PARTICIÓN DE RANGO (bs = [] o bs /= [])]
+<Max bs,cs : (x:xs) = bs++cs ∧ bs = [] ∧ elemI.bs : #bs>
+'Max'
+<Max bs,cs : (x:xs) = bs++cs ∧ bs /= [] ∧ elemI.bs : #bs>
+    [ANIDANDO EL PRIMER TERMINO: REEMPLAZO bs <- b:as EN EL SEGUNDO TERMINO (VÁLIDO POR bs /= [])]
+<Max bs : bs = [] : <Max cs : (x:xs) = bs++cs ∧ elemI.bs : #bs>
+'Max'
+<Max b,bs,cs : (x:xs) = (b:bs)++cs ∧ (b:bs) /= [] ∧ elemI.bs : #(b:bs)>
+    [RANGO UNITARIO]
+<Max cs : (x:xs) = []++cs ∧ elemI.[] : #[]>
+'Max'
+<Max b,bs,cs : (x:xs) = (b:bs)++cs ∧ (b:bs) /= [] ∧ elemI.bs : #(b:bs)>
+    [TERMINO CONSTANTE, DEF CARDINAL]
+0 'Max' <Max b,bs,cs : (x:xs) = (b:bs)++cs ∧ (b:bs) /= [] ∧ elemI.bs : #(b:bs)>
+    [DEF ++, IGUALDAD DE LISTAS]
+0 'Max' <Max b,bs,cs : x = b ∧ xs = bs++cs ∧ elemI.bs : #(b:bs)>
+    [ANIDADO, RANGO UNITARIO, DEF CARDINAL]
+0 'Max' <Max bs,cs : xs = bs++cs ∧ elemI.bs : 1+#bs>
+    [DISTRIBUTIVA DEL + CON RESPECTO AL MAX]
+0 'Max' (1 + <Max bs,cs : xs = bs++cs ∧ elemI.bs : #bs>)
+    [HI]
+0 'Max' (1 + g.xs)
+
+--PARA CONCLUIR
+g.[] = 0
+g.(x:xs) = 0 'Max' (1 + g.xs)
+
+f.[] = 0
+f.(x:xs) = g.(x:xs) 'Max' f.xs
+
 --------------------------------------------------------------------------------------
 -- Demostrar:
 --	    map (f • g) xs = map f (map g xs)
 
---------------------------------------------------------------------------------------
--- Especificar y derivar un algoritmo imperativo que calcule el máximo común divisor de dos números dados.
+map :: (a -> b) -> [a] -> [b]
+map f [] = []
+map f xs = f (head xs) : map f (tail xs)
+
+map (f • g) xs = map f (map g xs)
+map f (map g xs)
+    [DEF MAP]
+map f (g (head xs) : map g (tail xs))
 
 --------------------------------------------------------------------------------------
--- Implemente en Haskell la función g : [Int] -> [Int] -> [Int], que dadas dos listas de enteros xs e ys, devuelve una lista la cual en cada posición i contiene la suma del i-ésimo numero par de xs con el i-ésimo numero par de ys, en caso de que alguna de las dos listas no contenga i números pares se debe considerar un 0. 
---  Por ejemplo:	g  [1,2,4,6] [2,2] = [4,6,6]
+-- Especificar y derivar un algoritmo imperativo que calcule el máximo común divisor de dos números dados.
 
 --------------------------------------------------------------------------------------
 ----------------------------------------2018A-----------------------------------------
