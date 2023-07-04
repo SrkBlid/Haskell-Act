@@ -76,7 +76,7 @@
     •Normal: Los argumentos se pasan sin evaluar a una función hasta que sea necesario. Esto significa que los argumentos solo son evaluados cuando son requeridos por la función durante la ejecución.
     •Lazy: Al igual que la normal, los argumentos no se evaluan hasta que sean requeridos. Los valores se evaluan y se almacenan en memoria para su uso posterior, mejorando asi la eficiencia.
 
-•¿Se puede cambiar cambiar el orden de evaluación en Haskell? ¿Para que puede servir hacerlo? Dar ejemplo
+•¿Se puede cambiar el orden de evaluación en Haskell? ¿Para que puede servir hacerlo? Dar ejemplo
     Se puede cambiar temporalmente el orden de evaluación usando el operador $. Se puede utilizar para ahorrar parentesis o para composición de funciones.
     Ejemplo: sqrt 3 + 4 + 9 -> sqrt $ 3 + 4 + 9 = sqrt(3 + 4 + 9)
 
@@ -98,19 +98,25 @@
         -No puede trabajar afuera de listas.
         -Es poco eficiente cuando la función requiere asociación a izquierda.
 
-•¿Que es el wp? ¿Cuales son sus propiedades más importantes?
-    El wp es la "weakest precondition", es decir, la precondición más débil que hace que la postcondición se cumpla/sea verdadera.
-    Dentro de sus propiedades más importantes nos encontramos con:
-        - skip: Es como el 0 en algebra, su utilidad es no hacer nada.
-                 wp.skip.Q = Q
-        - abort: Representa el finiquito del programa.
-                 wp.abort.Q = False
-        - := (asignación): Como su nombre lo indica, sirve para asignar valores a las variables que se encuentran en Q.
-                 wp.(x := E).Q = Q(x := E)
-        - ; (concatenación): Dada la concatenación S;T, se obtiene su wp tomando primero el wp del que se encuentra más a la derecha y se toma como Q del anterior al mismo, es decir:
-                 wp.(S;T).Q = wp.S.(wp.T.Q)
-        Para demostrar {P}S;T{Q} hay que encontrar un R que sea postcondición de S y precondición de T, tal que:
-                 {P}S{R} ∧ {R}T{Q}
+•¿Qué es el wp? ¿Cuáles son sus propiedades más importantes? Explicar el wp para la asignación y el if. 
+El wp es la "weakest precondition", es decir, la precondición mas debil que hace valido a la postcondición.
+Dentro de ella hay 5 propiedades importantes (Son las propiedades de las ternas de Hoare) las cuales son:
+    •Exclusión de milagros: {P}S{False} ≡ [P ≡ False]
+    •Fortalecimiento de la precondición: {P}S{Q} ∧ [P0 -> P] -> {P0}S{Q}
+        EJ: {x=2 ∧ x=5}S{Q} -> {x=2}S{Q}
+    •Debilitamiento de la postcondición: {P}S{Q} ∧ [Q -> Q0] -> {P}S{Q0}
+        EJ: {P}S{x=2} -> {P}S{x=2 v x=5}
+    •Conjunción de postcondición: {P}S{Q} ∧ {P}S{Q'} ≡ {P}S{Q y Q'}
+    •Disyunción de precondición: {P}S{Q} ∧ {P'}S{Q} ≡ {P v P'}S{Q}
+
+- := (ASIGNACIÓN): wp.(:=).Q
+    Lo que hacemos en la asignación es reemplazar cada elemento que se asigne en la postcondición, es decir: Q(:=)
+    EJ: wp.(x = x+1).(2x) = 2(x+1)
+
+- if: wp.if.q
+    Lo que comprobamos es [(B0 v...v Bn) ∧ (B0 -> wp.S0.Q) ∧...∧ (Bn -> wp.Sn.Q)
+    El wp del if requiere minimamente que alguna de las guardas sea verdadera y que cada una de ellas sea mas fuerte que la precondición más debil respecto a S.
+
 
 •¿Cuando dos programas imperativos son equivalentes?
     S y T son iguales cuando sus wp dan lo mismo.
@@ -138,3 +144,18 @@
 
     Las formas normales de una expresión es la expresión canonica la cual representa el mismo valor.
     Hay expresiones que no tienen forma normal, como: inf = inf+1
+
+•Automatas, diferencias entre AFD y AFND
+    Los AFD (Autómatas finitos deterministicos) son dispositivos con muy poca memoria, es decir, que se pueden moderar con un bit en el cual contamos con Estados, cambios de Estados, Estado inicial y Estado final.
+
+    Los AFND (Automatas finitos no deterministicos) son lo mismo que los deterministas pero con la diferencia de que para el mismo valor hay más de una alternativa. Toma el que le conviene.
+
+•Aceptación de un automata
+    Si al pasarle una cadena a una secuencia y al finalizar de consumir la cadena me encuentro en el estado final, esto quiere decir que el autómata reconoce a la cadena.
+    Si estamos con un AFND tenemos que ver si alguna rama nos lleva a cumplir el objetivo.
+
+•Operaciones sobre automatas
+    -Unión de automatas: Es como un and, al tener A0 y A1 -> A0 U A1
+    -Concatenación de automatas: Es como un or, al tener A0 y A1 -> A0 • A1
+    -Iteración: Donde dado un A -> A*
+    -AFND con transiciones lambda/epsilon: Es un skip que no consume el elemento pero se saltea un estado.
