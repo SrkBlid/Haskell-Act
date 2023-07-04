@@ -856,7 +856,7 @@ do i < N
 od
 {m = <Max as,bs,cs : a.i = as++bs++cs ∧ bs.i = 0 : #bs>}
 {I = N-i > 0}
-{v}
+
 
 --DEMOSTRACIONES
 --Inicialización: {P}S{I}
@@ -1278,27 +1278,157 @@ map f (g (head xs) : map g (tail xs))
 
 --------------------------------------------------------------------------------------
 -- Especificar y derivar un algoritmo imperativo que calcule el máximo común divisor de dos números dados.
+mcd x y
+    | x == y = x
+    | otherwise = x*y
+
+{P: x >= 0 ∧ y >= 0}
+if x == y -> r,y := x, x
+[] x <> y -> r := x*y
+fi
+{Q: r = mcd.x.y}
+
+--DEMOSTRACIÓN
+-- [P -> -B0 v...v -Bn] ∧ {P ∧ B0}S0{Q} ∧...∧ {P ∧ Bn}Sn{Q}
+--[P -> -B0 v...v -Bn]
+x >= 0 ∧ y >= 0 -> x <> y ∧ x == y
+    [ARITMETICA, ya que toma cuando x e y son iguales y cuando son distintos]
+x >= 0 ∧ y >= 0 -> True
+    [LÓGICA]
+True
+
+--{P ∧ B0}S0{Q}
+{x >= 0 ∧ y >= 0 ∧ x == y} r, y := x, x {r = mcd.x.y}
+    [DEF WP]
+x >= 0 ∧ y >= 0 ∧ x == y -> wp.(r, y := x, x).(r = mcd.x.y)
+    [DEF ASIGNACIÓN WP]
+x >= 0 ∧ y >= 0 ∧ x == y -> x = mcd.x.x
+    [DEF MCD]
+x >= 0 ∧ y >= 0 ∧ x == y -> x = x
+    [LÓGICA, LEIBNITZ]
+True
+
+--{P ∧ Bn}Sn{Q}
+{x >= 0 ∧ y >= 0 ∧ x <> y} r := x*y {r = mcd.x.y}
+    [DEF WP]
+x >= 0 ∧ y >= 0 ∧ x <> y -> wp.(r := x*y).(r = mcd.x.y)
+    [DEF ASIGNACIÓN WP]
+x >= 0 ∧ y >= 0 ∧ x <> y -> x*y = mcd.x.y
+    [DEF MCD]
+x >= 0 ∧ y >= 0 ∧ x <> y -> x*y = x*y
+    [LÓGICA]
+True
 
 --------------------------------------------------------------------------------------
 ----------------------------------------2018A-----------------------------------------
 --------------------------------------------------------------------------------------
 -- Especificar y derivar una función imperativa que calcule Fibonacci.
+fib 0 = 0
+fib 1 = 1
+fib n = fib(n-1)+fib(n-2)
+
+{P: N >= 0}
+r, i := 0, N
+do i >= 0
+    if i == 0 -> r := r
+    [] i == 1 -> r, i := r+1, i-1
+    [] i >= 2 -> r, i := r+fib(i-1)+fib(i-2), i-1
+    fi
+od
+{Q: r = fib i ∧ i = 0}
+{I: r = fib i}
+{v: N-i >= 0}
+
+--Inicialización: {P}S{I}
+{N >= 0} r, i := 0, N {r = fib i}
+    [DEF WP]
+N >= 0 -> wp.(r, i := 0, N).(r = fib i)
+    [DEF ASIGNACIÓN WP]
+N >= 0 -> 0 = fib N
+    [LEIBNITZ]
+N >= 0 -> 0 = fib 0
+    [DEF FIB]
+N >= 0 -> 0 = 0
+    [LÓGICA]
+True
+
+--Precondición: I ∧ (-B0 ∧...∧ -Bn) -> Q
+
+--Invariante: {I ∧ Bn} Sn {I}
+
+--Variante(a): I ∧ Bn -> v >= 0
+
+--Variante(b): {I ∧ Bn ∧ v = A} Sn {v < A}
+
+
 
 --------------------------------------------------------------------------------------
 -- Dada la siguiente especificación:
 --	    f.n = <Σ i : 0 <= i < n : 1/n>
---  Derive una función. Utilice alguna técnica para mejorar la eficiencia de su programa.
+-- Derive una función. Utilice alguna técnica para mejorar la eficiencia de su programa.
 
---------------------------------------------------------------------------------------
--- ¿Cómo definiría el tipo lista en Haskell con definiciones inductivas? Defina la función longitud y la concatenación de listas sobre su tipo lista.
+--CB 0
+f.0
+    [ESPECIFICACIÓN]
+<Σ i : 0 <= i < 0 : 1/0>
+    [RANGO VACIO]
+0
+
+--CI n+1
+--HI f.n = <Σ i : 0 <= i < n : 1/n>
+f.n+1
+    [ESPECIFICACIÓN]
+<Σ i : 0 <= i < n+1 : 1/n+1>
+    [LÓGICA, PARTICIÓN DE RANGO]
+<Σ i : 0 <= i < n : 1/n+1> + <Σ i : n <= i < n+1 : 1/n+1>
+    [RANGO UNITARIO]
+<Σ i : 0 <= i < n : 1/n+1> + 1/n+1
+
+    [INTRODUCIMOS g.n.m]
+    g.n.m = <Σ i : 0 <= i < n : 1/n+m>
+
+--CB 0
+g.0.m 
+    [ESPECIFICACIÓN]
+<Σ i : 0 <= i < 0 : 1/0+m>
+    [RANGO VACIO]
+0
+
+--CI n+1
+--HI g.n.m = <Σ i : 0 <= i < n : 1/n+m>
+g.(n+1).m 
+    [ESPECIFICACIÓN]
+<Σ i : 0 <= i < (n+1) : 1/(n+1)+m>
+    [LÓGICA, PARTICIÓN DE RANGO]
+<Σ i : 0 <= i < n : 1/(n+1)+m> + <Σ i : n <= i < (n+1) : 1/(n+1)+m>
+    [RANGO UNITARIO, ASOCIATIVA +]
+<Σ i : 0 <= i < n : 1/n+(1+m)> + 1/(n+(1+m))
+    [HI, con m = 1+m]
+g.n.(1+m) + 1/(n+(1+m))
+
+    [VOLVIENDO]
+
+g.0.m = 0
+g.(n+1).m = g.n.(1+m) + 1/(n+(1+m))
+
+f.0 = 0
+f.(n+1) = g.n.m + 1/n+1
+
+[FALTA USAR UNA TECNICA PARA MEJORAR LA EFICIENCIA, SEGURAMENTE TUPLING]
 
 --------------------------------------------------------------------------------------
 -- Explique los siguientes conceptos:
---	    •Precondición
---	    •Postcondición
---	    •Invariante
---	    •Variante
---  De ejemplos.
+•Precondición: La precondición es lo que tiene que cumplir las variables del programa para entrar en la ejecución del mismo. La precondición tiene que ser más fuerte que la postcondición, por lo que tiene que precederla, asi mismo para llegar a ella.
+{x >= 0}S{Q}
+
+•Postcondición: La postcondición es el valor esperado de las variables al finalizar la ejecución del programa, al ser valida la postcondición, es valido el programa.
+{P}S{r = mod 2 i}
+
+•Invariante: El invariante son aquellas variables o fórmulas que al pasar durante los ciclos nunca cambian, nunca varian.
+{I: x-N >= 0}
+
+•Variante: El variante es justamente lo contrario al invariante, es lo que varia todos los ciclos para lograr llegar al cambio de condicionalidad. Es una expresión aritmetica.
+{v: i-N}
 
 --------------------------------------------------------------------------------------
 ----------------------------------------2018B-----------------------------------------
@@ -1308,19 +1438,125 @@ map f (g (head xs) : map g (tail xs))
 --------------------------------------------------------------------------------------
 -- Especificar y derivar una función f : [Num] -> Num, tal que devuelve la suma del subsegmento de suma mínima de una secuencia de números enteros.
 
+f.xs = <Min as,bs,cs : xs = as++bs++cs : sum.bs>
+sum.bs = <Σi : 0 <= i < #bs : bs.i>
+
+
+--CB []
+f.[]
+    [ESPECIFICACIÓN]
+<Min as,bs,cs : [] = as++bs++cs : sum.bs>
+    [PROP ++]
+<Min as,bs,cs : [] = as++bs++cs ∧ as = [] ∧ bs = [] ∧ cs = [] : sum.bs>
+    [TERMINO CONSTANTE]
+sum.[]
+    [DEF SUM]
+0
+
+--CI x:xs
+--HI f.xs = <Min as,bs,cs : xs = as++bs++cs : sum.bs>
+f.(x:xs)
+    [ESPECIFICACIÓN]
+<Min as,bs,cs : (x:xs) = as++bs++cs : sum.bs>
+    [PARTICIÓN DE RANGO, a = [] o a <> []]
+<Min as,bs,cs : (x:xs) = as++bs++cs ∧ as = [] : sum.bs> 'Min' <Min as,bs,cs : (x:xs) = as++bs++cs ∧ as <> [] : sum.bs>
+    [ANIDAMIENTO, EXISTENCIA DE A:AS]
+<Min as : as = [] : <Min bs,cs : (x:xs) = as++bs++cs : sum.bs>> 'Min' <Min as,bs,cs : (x:xs) = (a:as)++bs++cs ∧ as <> [] : sum.bs>
+    [RANGO UNITARIO, DEFINICIÓN ++]
+<Min bs,cs : (x:xs) = bs++cs : sum.bs> 'Min' <Min as,bs,cs : (x:xs) = (a:as)++bs++cs ∧ as <> [] : sum.bs>
+    [DEF ++, IGUALDAD DE LISTAS]
+<Min bs,cs : (x:xs) = bs++cs : sum.bs> 'Min' <Min as,bs,cs : x = a ∧ xs = as++bs++cs : sum.bs>
+    [ANIDADO, RANGO UNITARIO]
+<Min bs,cs : (x:xs) = bs++cs : sum.bs> 'Min' <Min as,bs,cs : xs = as++bs++cs : sum.bs>
+    [HI]
+<Min bs,cs : (x:xs) = bs++cs : sum.bs> 'Min' f.xs
+
+    [INTRODUCCIÓN DE g.xs = <Min bs,cs : xs = bs++cs : sum.bs>]
+
+--CB []
+g.[] 
+    [ESPECIFICACIÓN]
+<Min bs,cs : [] = bs++cs : sum.bs>
+    [PROP ++]
+<Min bs,cs : [] = bs++cs ∧ bs = [] ∧ cs = [] : sum.bs>
+    [RANGO UNITARIO]
+sum.[]
+    [DEF SUM]
+0
+
+--CI x:xs
+--HI g.xs = <Min bs,cs : xs = bs++cs : sum.bs>
+g.(x:xs)
+    [ESPECIFICACIÓN]
+<Min bs,cs : (x:xs) = bs++cs : sum.bs>
+    [PARTICIÓN DE RANGO, bs = [] o bs <> [] ]
+<Min bs,cs : (x:xs) = bs++cs ∧ bs = [] : sum.bs> 'Min' <Min bs,cs : (x:xs) = bs++cs ∧ bs <> [] : sum.bs>
+    [ANIDAMIENTO, EXISTENCIA DE B:BS YA QUE BS <> [] ]
+<Min bs : bs = [] : <Min cs : (x:xs) = bs++cs : sum.bs>> 'Min' <Min bs,cs : (x:xs) = (b:bs)++cs : sum.(b:bs)>
+    [RANGO UNITARIO, DEF ++]
+<Min cs : (x:xs) = cs : sum.[]> 'Min' <Min bs,cs : (x:xs) = (b:bs)++cs : sum.(b:bs)>
+    [TERMINO CONSTANTE, DEF SUM, IGUALDAD DE LISTAS]
+0 'Min' <Min bs,cs : x = b ∧ xs = bs++cs : sum.(b:bs)>
+    [ANIDADO, RANGO UNITARIO, DEF SUM]
+0 'Min' <Min bs,cs : xs = bs++cs : b+sum.bs>
+    [HI]
+0 'Min' (x+g.xs)
+
+--PARA CONCLUIR
+g.[] = 0
+g.(x:xs) = 0 'Min' (x+g.xs)
+
+f.[] = 0
+f.(x:xs) = g.(x:xs) 'Min' f.xs
+
 --------------------------------------------------------------------------------------
 -- Sea ⊕ donde ⊕ es una operación asociativa y conmutativa, probar la siguiente regla de cuantificadores:
 --	    <⊕i, j : i = Z ∧ R.i.j : T.i.j> ≡ <⊕j : R.Z.j : T.Z.j>
 
+<⊕i, j : i = Z ∧ R.i.j : T.i.j> ≡ <⊕j : R.Z.j : T.Z.j>
+    [i CONSTANTE]
+<⊕i : R.Z.j : T.Z.j> ≡ <⊕j : R.Z.j : T.Z.j>
+
+    [¿ES ASI? NO CREO]
+
 --------------------------------------------------------------------------------------
 -- Demostrar:
 --	    foldr (+) 0 xs = <Σ i : 0 <= i < #xs : xs.i>
+
+foldr :: (a -> b -> b) -> b -> [a] -> b
+foldr f z [] = z
+foldr f z (x:xs) = f x (foldr f z xs)
+
+foldr (+) 0 xs = <Σ i : 0 <= i < #xs : xs.i>
+    [DEF Σ]
+foldr (+) 0 xs = sum.xs
+    [DEF FOLDR]
+sum.xs = sum.xs
+    [LÓGICA]
+True
 
 --------------------------------------------------------------------------------------
 -----------------------------------------2019-----------------------------------------
 --------------------------------------------------------------------------------------
 -- Especifique y derive una función recursiva que diga si, dada una secuencia de xs, existe una subsecuencia no vacía con suma 0.
 
+f.xs = <∃ as,bs,cs : xs = as++bs++cs : sum.bs = 0>
+
+--CB []
+f.[]
+    [ESPECIFICACIÓN]
+<∃ as,bs,cs : [] = as++bs++cs : sum.bs = 0>
+
+--CI x:xs
+--HI f.xs = <∃ as,bs,cs : xs = as++bs++cs : sum.bs = 0>
+f.(x:xs)
+    [ESPECIFICACIÓN]
+<∃ as,bs,cs : (x:xs) = as++bs++cs : sum.bs = 0>
+
 --------------------------------------------------------------------------------------
 -- Demostrar o refutar la siguiente propiedad:
 --	    wp.S.P v Q ≡ wp.S.P v wp.S.Q
+
+wp.S.P v Q ≡ wp.S.P v wp.S.Q
+    [DEF WP]
+wp.S.P v Q ≡ wp.S.P v {True}S{Q}

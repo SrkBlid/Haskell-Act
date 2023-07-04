@@ -38,3 +38,23 @@ pares (x:xs)
     | (x:xs) == [] = []
     | mod x 2 == 0 = x : pares xs
     | otherwise = pares xs
+
+
+--------------------------------------------------------------------------------------
+-- ¿Cómo definiría el tipo lista en Haskell con definiciones inductivas? Defina la función longitud y la concatenación de listas sobre su tipo lista.
+data Lista a = Nill | Cons a (Lista a) deriving Show
+
+longiL :: Lista a -> Int
+longiL Nill = 0
+longiL (Cons n m) = 1+longiL m
+
+concL :: Lista a -> Lista a -> Lista a
+concL Nill Nill = Nill
+concL Nill (Cons m ys) = (Cons m ys)
+concL (Cons n xs) Nill = (Cons n xs)
+concL (Cons n xs) (Cons m ys) = (Cons n (Cons m (concL xs ys)))
+
+concat2 :: Lista a -> Lista a -> Lista a
+concat2 Nill  b = b
+concat2 a Nill = a
+concat2 (Cons a (xs)) (Cons b (ys)) = (Cons a (Cons b (concat2 xs ys)))
